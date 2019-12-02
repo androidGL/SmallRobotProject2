@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/SmallRebotProject.iml" filepath="$PROJECT_DIR$/SmallRebotProject.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bloodglu/bloodglu.iml" filepath="$PROJECT_DIR$/bloodglu/bloodglu.iml" />
+      <module fileurl="file://$PROJECT_DIR$/bloodpressure/bloodpressure.iml" filepath="$PROJECT_DIR$/bloodpressure/bloodpressure.iml" />
+      <module fileurl="file://$PROJECT_DIR$/common/common.iml" filepath="$PROJECT_DIR$/common/common.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ecg/ecg.iml" filepath="$PROJECT_DIR$/ecg/ecg.iml" />
+      <module fileurl="file://$PROJECT_DIR$/inquiry/inquiry.iml" filepath="$PROJECT_DIR$/inquiry/inquiry.iml" />
+    </modules>
+  </component>
+</project>

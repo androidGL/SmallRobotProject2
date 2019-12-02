@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2015, Nordic Semiconductor
+  ~ All rights reserved.
+  ~
+  ~ Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
+  ~
+  ~ 1. Redistributions of source code must retain the above copyright notice, this list of conditions and the following disclaimer.
+  ~
+  ~ 2. Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the following disclaimer in the
+  ~ documentation and/or other materials provided with the distribution.
+  ~
+  ~ 3. Neither the name of the copyright holder nor the names of its contributors may be used to endorse or promote products derived from this
+  ~ software without specific prior written permission.
+  ~
+  ~ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+  ~ LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+  ~ HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+  ~ LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+  ~ ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE
+  ~ USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  -->
+<resources>
+
+    <string name="gls_feature_title">BGM(血糖仪)</string>
+
+    <string name="gls_default_name">血糖仪</string>
+    <string name="gls_section_data">记录</string>
+    <string name="gls_no_data">暂无数据</string>
+    <string name="gls_action_all">所有记录</string>
+    <string name="gls_action_last">最近一次</string>
+    <string name="gls_action_more">更多</string>
+
+    <string-array name="gls_type">
+        <item>Reserved for future use</item>
+        <item>毛细血管全血葡萄糖</item>
+        <item>Capillary Plasma</item>
+        <item>Venous Whole blood</item>
+        <item>Venous Plasma</item>
+        <item>Arterial Whole blood</item>
+        <item>Arterial Plasma</item>
+        <item>Undetermined Whole blood</item>
+        <item>Undetermined Plasma</item>
+        <item>Interstitial Fluid (ISF)</item>
+        <item>Control Solution</item>
+    </string-array>
+    <string name="gls_location_title">采样部位</string>
+    <string-array name="gls_location">
+        <item>保留</item>
+		<item>指尖静脉血</item>
+		<item>Alternate Site Test (AST)</item>
+		<item>耳垂</item>
+		<item>质控液</item>
+		<item>保留</item>
+		<item>保留</item>
+		<item>保留</item>
+		<item>保留</item>
+		<item>保留</item>
+		<item>保留</item>
+		<item>保留</item>
+		<item>保留</item>
+		<item>保留</item>
+		<item>保留</item>
+		<item>采样部位值不可用</item>
+    </string-array>
+    <string name="gls_status_annunciation_title">Sensor Status Annunciation</string>
+    <string-array name="gls_status_annunciation">
+        <item>Device battery low at time of measurement</item>
+	    <item>Sensor malfunction or faulting at time of measurement</item>
+	    <item>Sample size for blood or control solution insufficient at time of measurement</item>
+	    <item>Strip insertion error</item>
+	    <item>Strip type incorrect for device</item>
+	    <item>Sensor result higher than the device can process</item>
+	    <item>Sensor result lower than the device can process</item>
+	    <item>Sensor temperature too high for valid test/result at time of measurement</item>
+	    <item>Sensor temperature too low for valid test/result at time of measurement</item>
+	    <item>Sensor read interrupted because strip was pulled too soon at time of measurement</item>
+	    <item>General device fault has occurred in the sensor</item>
+	    <item>Time fault has occurred in the sensor and time may be inaccurate</item>
+    </string-array>
+
+	<string name="gls_progress_zero">No records found</string>
+	<plurals name="gls_progress">
+		<item quantity="zero">No records found</item>
+		<item quantity="one">Downloading %d record</item>
+		<item quantity="two">Downloading %d records</item>
+		<item quantity="few">Downloading %d records</item>
+		<item quantity="other">Downloading %d records</item>
+		<item quantity="many">Downloading %d records</item>
+	</plurals>
+    <string name="gls_operation_not_supported">Operation not supported by the device</string>
+    <string name="gls_operation_failed">Operation failed</string>
+    <string name="gls_value">%.1f</string>
+    <string name="gls_unit_mgpdl">mg/dl</string>
+    <string name="gls_unit_mmolpl">mmol/l</string>
+
+    <string name="gls_about_text">GLUCOSE SERVICE profile allows you to connect to your Glucose sensor. 
+        You can read the last and historical glucose measurement readings from the device. The current implementation supports also the
+        Glucose Measurement Context characteristic which is not supported by the GLS sample in the NRF5x SDK.</string>
+
+</resources>

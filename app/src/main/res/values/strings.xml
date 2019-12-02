@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">福娃</string>
+    <string name="register1">请选择您的身份:</string>
+    <string name="register2">请选择您的出生年份:</string>
+    <string name="register3">请选择您的性别:</string>
+    <string name="register4">请选择您的身高:</string>
+    <string name="register5">请选择您的体重:</string>
+    <string name="register6">请选择您的健康状况:</string>
+    <string name="register7">请填写您的昵称:</string>
+    <string name="starttip">检测到您还未注册用户，建议您去注册个人信息，以便于福娃的诊断结果更准确</string>
+    <string name="to_register">我是新用户>>></string>
+    <string name="registe8">选填</string>
+    <string name="setting1">当前登录用户</string>
+    <string name="setting2">查看用户列表</string>
+    <string name="title_user_list">用户列表</string>
+    <string name="title_activity_face">完善人脸信息</string>
+    <array name="list_user">
+        <item>爷爷</item>
+        <item>奶奶</item>
+        <item>爸爸</item>
+        <item>妈妈</item>
+        <item>男童</item>
+        <item>女童</item>
+        <item>姥爷</item>
+        <item>姥姥</item>
+        <item>自定义</item>
+    </array>
+</resources>

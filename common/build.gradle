@@ -1,0 +1,77 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.jakewharton.butterknife'
+apply plugin: 'org.greenrobot.greendao'
+
+android {
+    compileSdkVersion rootProject.ext.android["compileSdkVersion"]
+    buildToolsVersion rootProject.ext.android["buildToolsVersion"]
+    defaultConfig {
+        minSdkVersion rootProject.ext.android["minSdkVersion"]
+        targetSdkVersion rootProject.ext.android["targetSdkVersion"]
+        versionCode rootProject.ext.android["versionCode"]
+        versionName rootProject.ext.android["versionName"]
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        // 配置.so文件
+        ndk {
+            // 选择要添加的对应的cpu类型的.so库
+            abiFilters 'x86', 'armeabi', 'armeabi-v7a', 'armeabi-v8a', 'mips', 'mips64', 'x86_64'
+        }
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments = [moduleName: project.getName()]
+            }
+        }
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        //配置JNILibs
+        sourceSets {
+            main {
+                jniLibs.srcDirs = ['libs']
+            }
+        }
+        repositories {
+            flatDir {
+                dirs 'libs'
+            }
+        }
+    }
+    compileOptions {
+        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_1_8
+    }
+}
+greendao{
+    schemaVersion 1 //数据库版本号
+}
+dependencies {
+    api fileTree(include: ['*.jar'], dir: 'libs')
+    testImplementation 'junit:junit:4.12'
+    api rootProject.ext.dependencies["appcompat-v7"]
+    annotationProcessor rootProject.ext.dependencies["arouter-compiler"]
+    api rootProject.ext.dependencies["arouter-api"]
+
+    api rootProject.ext.dependencies["butterknife"]
+    annotationProcessor   rootProject.ext.dependencies["butterknife-apt"]
+
+//    api rootProject.ext.dependencies["rxjava"]
+    api rootProject.ext.dependencies["rxandroid"]
+    api rootProject.ext.dependencies["retrofit"]
+    api rootProject.ext.dependencies["mocknet"]
+    api rootProject.ext.dependencies["retrofit-converter-gson"]
+    api rootProject.ext.dependencies["retrofit-adapter-rxjava"]
+    api rootProject.ext.dependencies["annotations"]
+    api rootProject.ext.dependencies["dagger2"]
+    api rootProject.ext.dependencies["logging"]
+    api rootProject.ext.dependencies["recyclerview-v7"]
+    annotationProcessor rootProject.ext.dependencies["dagger2-apt-compiler"]
+    implementation files('libs/Msc.jar')
+
+    api rootProject.ext.dependencies["greendao"]
+}

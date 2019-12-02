@@ -1,0 +1,35 @@
+<resources>
+    <string name="request_start_tip">\n接下来我会询问您一些病史以及现在的病症等相关问题，答案的准确性和真实性很重要，请您选择以下任意一种方式根据实际情况认真作答。</string>
+    <string name="request_type_select">触屏点击 \n\n我们会展示一些问题和选项\n请您选择最符合您的选项</string>
+    <string name="request_type_speak">语音交互 \n\n我们询问您一些问题\n请您准确描述出您的情况</string>
+    <string name="request_bottom">请讲话...</string>
+    <string name="question_finish">确认</string>
+    <array name="list_question">
+        <item>请问你眩晕多久了？</item>
+        <item>你一般在什么情况下出现眩晕？</item>
+        <item>请描述下眩晕发作时的感觉。</item>
+        <item>请用0-5来描述你眩晕的程度。</item>
+        <item>请描述下眩晕持续的时间。</item>
+        <item>眩晕多久出现一次?</item>
+        <item>父母或其他直系亲属有没有过眩晕</item>
+    </array>
+    <array name="list_answer">
+        <item>1个月内，1~3个月，3~12月，1~3年，多余3年</item>
+        <item>起卧床或翻身，抬头或低头，劳累后，噪声或特定声音诱发，头部转动或摇晃，直立行走，情绪激动，睡眠不足，不清楚</item>
+        <item>周围在旋转或者房子在晃动，站不住，头重脚轻昏昏沉沉</item>
+        <item>1轻微，2中度，3严重，4特别严重，5晕倒</item>
+        <item>1分种内，1小时内，几个小时，更长时间</item>
+        <item>每天，几天，几个月</item>
+        <item>有，无</item>
+    </array>
+    <array name="list_type">
+        <item>咳嗽</item>
+        <item>头晕</item>
+        <item>头痛</item>
+        <item>发烧</item>
+        <item>嗓子痛</item>
+        <item>鼻塞</item>
+        <item>恶心</item>
+        <item>胃痛</item>
+    </array>
+</resources>

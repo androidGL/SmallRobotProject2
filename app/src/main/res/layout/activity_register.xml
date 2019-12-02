@@ -1,0 +1,348 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:focusable="true"
+    android:focusableInTouchMode="true">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_height_top"
+        android:background="@color/main_color"
+        android:gravity="center"
+        android:text="@string/register"
+        android:textColor="@color/title_text"
+        android:textSize="@dimen/title_size"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="@dimen/title_height_top"
+        android:onClick="back"
+        android:padding="10dp"
+        android:src="@mipmap/back"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/register"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_height"
+        android:background="@color/text_color"
+        android:gravity="center"
+        android:onClick="toRegister"
+        android:text="确认"
+        android:textColor="@color/white"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:background="@color/main_gray_color"
+        android:padding="10dp"
+        app:layout_constraintBottom_toTopOf="@id/register"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/register1"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/main_text_size" />
+                <TextView
+                    android:id="@+id/info_type_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="5dp"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/main_text_size" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <com.pcare.common.util.TextImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="selectID"
+                    android:tag="0"
+                    app:imageSrc="@mipmap/grandfather"
+                    app:text="爷爷" />
+
+                <com.pcare.common.util.TextImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="selectID"
+                    android:tag="1"
+                    app:imageSrc="@mipmap/grandmother"
+                    app:text="奶奶" />
+
+                <com.pcare.common.util.TextImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="selectID"
+                    android:tag="2"
+                    app:imageSrc="@mipmap/yongman"
+                    app:text="叔叔" />
+
+                <com.pcare.common.util.TextImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:onClick="selectID"
+                    android:tag="3"
+                    app:imageSrc="@mipmap/yongwoman"
+                    app:text="阿姨" />
+            </LinearLayout>
+
+            <!--<com.pcare.common.view.CheckBoxGroup-->
+            <!--android:id="@+id/checkgroup"-->
+            <!--android:layout_width="match_parent"-->
+            <!--android:layout_height="wrap_content"/>-->
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/register7"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/main_text_size" />
+
+                <EditText
+                    android:id="@+id/info_name"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/bg_edittext"
+                    android:hint="请设置一个昵称"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/very_small_size" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/register2"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/main_text_size" />
+
+                <TextView
+                    android:id="@+id/info_year"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/main_text_size" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_button_gray"
+                    android:onClick="selectYear"
+                    android:padding="5dp"
+                    android:text="点击选择"
+                    android:textColor="@color/title_text"
+                    android:textSize="@dimen/very_small_size" />
+            </LinearLayout>
+            <!--<DatePicker-->
+            <!--android:layout_width="wrap_content"-->
+            <!--android:layout_height="wrap_content"-->
+            <!--android:calendarViewShown="false"-->
+            <!--android:datePickerMode="spinner"></DatePicker>-->
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginRight="10dp"
+                    android:text="@string/register3"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/main_text_size" />
+
+                <com.pcare.common.view.ScreenCheckBox
+                    android:id="@+id/checkbox_male"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="5dp"
+                    android:text="男" />
+
+                <com.pcare.common.view.ScreenCheckBox
+                    android:id="@+id/checkbox_female"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:button="@null"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="5dp"
+                    android:text="女" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/register4"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/main_text_size" />
+
+                <EditText
+                    android:id="@+id/info_stature"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/bg_edittext"
+                    android:hint="@string/registe8"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/very_small_size" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/register5"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/main_text_size" />
+
+                <EditText
+                    android:id="@+id/info_weight"
+                    android:layout_width="200dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="10dp"
+                    android:layout_marginRight="10dp"
+                    android:background="@drawable/bg_edittext"
+                    android:hint="@string/registe8"
+                    android:padding="5dp"
+                    android:textColor="@color/text_color"
+                    android:textSize="@dimen/very_small_size" />
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:text="@string/register6"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/main_text_size" />
+
+            <com.pcare.common.view.CheckBoxGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <com.pcare.common.view.ScreenCheckBox
+                    android:id="@+id/healthy1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:button="@null"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="5dp"
+                    android:text="高血压" />
+
+                <com.pcare.common.view.ScreenCheckBox
+                    android:id="@+id/healthy2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:button="@null"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="5dp"
+                    android:text="高血糖" />
+
+                <com.pcare.common.view.ScreenCheckBox
+                    android:id="@+id/healthy3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="20dp"
+                    android:button="@null"
+                    android:paddingLeft="10dp"
+                    android:paddingTop="5dp"
+                    android:paddingRight="10dp"
+                    android:paddingBottom="5dp"
+                    android:text="心脏病" />
+            </com.pcare.common.view.CheckBoxGroup>
+
+            <EditText
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginRight="10dp"
+                android:background="@drawable/bg_edittext"
+                android:hint="其他"
+                android:padding="5dp"
+                android:textColor="@color/text_color"
+                android:textSize="@dimen/very_small_size" />
+        </LinearLayout>
+
+
+
+    </ScrollView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

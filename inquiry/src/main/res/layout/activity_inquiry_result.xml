@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:textSize="@dimen/main_text_size"
+        android:gravity="center"
+        android:text="问诊结果页面，包含个人信息，问诊类型，问诊结果，用药建议，饮食建议，运动建议等"/>
+
+</LinearLayout>

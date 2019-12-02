@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="10dp">
+
+    <ImageView
+        android:id="@+id/user_img"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@mipmap/grandmother" />
+
+    <TextView
+        android:id="@+id/user_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:text="奶奶"
+        android:layout_centerVertical="true"
+        android:layout_toRightOf="@id/user_img"
+        android:textSize="@dimen/main_text_size" />
+
+    <ImageView
+        android:id="@+id/user_list_delete"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="9dp"
+        android:layout_alignParentRight="true"
+        android:src="@mipmap/delete"/>
+    <ImageView
+        android:id="@+id/user_list_edit"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:padding="10dp"
+        android:gravity="right"
+        android:layout_toLeftOf="@id/user_list_delete"
+        android:src="@mipmap/edit"/>
+</RelativeLayout>

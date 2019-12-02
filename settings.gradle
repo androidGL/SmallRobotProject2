@@ -1,0 +1,1 @@
+include ':app', ':ecg', ':common', ':inquiry', ':bloodpressure', ':bloodglu'

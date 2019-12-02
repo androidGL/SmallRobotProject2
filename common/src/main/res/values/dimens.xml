@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    //字体大小设置
+    //主题字体大小
+    <dimen name="main_text_size">18sp</dimen>
+    //提示字体
+    <dimen name="big_tip_size">26sp</dimen>
+    //标题字体
+    <dimen name="title_size">24sp</dimen>
+    //大字体
+    <dimen name="big_size">60sp</dimen>
+    //小字体
+    <dimen name="small_size">16sp</dimen>
+    //极小字体
+    <dimen name="very_small_size">12sp</dimen>
+
+    //高度设置
+    <dimen name="title_height">40dp</dimen>
+    <dimen name="title_height_top">40dp</dimen>
+    <dimen name="title_height_second">30dp</dimen>
+    <dimen name="title_right_png">40dp</dimen>
+</resources>

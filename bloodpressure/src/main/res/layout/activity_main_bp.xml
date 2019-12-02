@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_height">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/title_height"
+            android:background="@color/main_color"
+            android:gravity="center"
+            android:text="血压监测"
+            android:textColor="@color/title_text"
+            android:textSize="@dimen/title_size" />
+
+        <ImageView
+            android:id="@+id/help"
+            android:layout_width="@dimen/title_right_png"
+            android:layout_height="@dimen/title_right_png"
+            android:layout_alignParentRight="true"
+            android:paddingRight="10dp"
+            android:src="@mipmap/history" />
+        <ImageView
+            android:layout_width="40dp"
+            android:padding="10dp"
+            android:src="@mipmap/back"
+            android:onClick="back"
+            android:layout_height="@dimen/title_height_top" />
+    </RelativeLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="此处显示提示信息..."
+            android:textSize="@dimen/main_text_size" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="血压仪开关：关（请打开血压仪开关）"
+            android:textSize="@dimen/main_text_size" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="20dp"
+            android:text="连接状态：连接中..."
+            android:textSize="@dimen/main_text_size" />
+    </LinearLayout>
+
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/title_height"
+        android:layout_gravity="bottom"
+        android:layout_marginTop="50dp"
+        android:background="@color/bottom_btn_color"
+        android:gravity="center"
+        android:onClick="toOEM"
+        android:text="开始测量"
+        android:textColor="@color/white"
+        android:textSize="@dimen/title_size" />
+
+</LinearLayout>
