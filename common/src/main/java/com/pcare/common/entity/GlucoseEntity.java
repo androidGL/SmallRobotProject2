@@ -36,15 +36,23 @@ public class GlucoseEntity {
 	private String userId;//用户ID
 	private int sequenceNumber;//序列号
 	private Date timeDate;//时间
-	private float glucoseConcentration;//血压值，默认0
+	private String glucoseConcentration;//血压值，默认0
 	private int sampleType;//测量类型，默认0
 	private int sampleLocation;//测量位置，默认0
 	private int status;//状态码，默认0
 
+	public GlucoseEntity(String userId, int sequenceNumber, Date timeDate, String glucoseConcentration, int sampleType, int sampleLocation, int status) {
+		this.userId = userId;
+		this.sequenceNumber = sequenceNumber;
+		this.timeDate = timeDate;
+		this.glucoseConcentration = glucoseConcentration;
+		this.sampleType = sampleType;
+		this.sampleLocation = sampleLocation;
+		this.status = status;
+	}
 
-
-	@Generated(hash = 644644801)
-	public GlucoseEntity(Long gluId, String userId, int sequenceNumber, Date timeDate, float glucoseConcentration, int sampleType, int sampleLocation,
+	@Generated(hash = 651072775)
+	public GlucoseEntity(Long gluId, String userId, int sequenceNumber, Date timeDate, String glucoseConcentration, int sampleType, int sampleLocation,
 			int status) {
 		this.gluId = gluId;
 		this.userId = userId;
@@ -60,8 +68,6 @@ public class GlucoseEntity {
 	public GlucoseEntity() {
 	}
 
-
-
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) {
@@ -69,7 +75,7 @@ public class GlucoseEntity {
 		}
 		if (obj instanceof GlucoseEntity) {
 			return this.getTimeDate().equals(((GlucoseEntity) obj).getTimeDate())
-					&& this.getGlucoseConcentration() == ((GlucoseEntity) obj).getGlucoseConcentration();
+					&& this.getGlucoseConcentration() .equals (((GlucoseEntity) obj).getGlucoseConcentration());
 		}
 		return false;
 	}
@@ -119,11 +125,11 @@ public class GlucoseEntity {
 		this.timeDate = timeDate;
 	}
 
-	public float getGlucoseConcentration() {
+	public String getGlucoseConcentration() {
 		return this.glucoseConcentration;
 	}
 
-	public void setGlucoseConcentration(float glucoseConcentration) {
+	public void setGlucoseConcentration(String glucoseConcentration) {
 		this.glucoseConcentration = glucoseConcentration;
 	}
 
@@ -150,4 +156,5 @@ public class GlucoseEntity {
 	public void setStatus(int status) {
 		this.status = status;
 	}
+
 }

@@ -2,6 +2,7 @@ package com.pcare.common.table;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 
 import com.pcare.common.entity.DaoMaster;
 import com.pcare.common.entity.DaoSession;
@@ -95,12 +96,14 @@ public class GluTableController {
      * 会自动判定是插入还是替换
      * @param glucoseEntity
      */
-    public void insertOrReplace(GlucoseEntity glucoseEntity){
-        if(glucoseEntity.getUserId().equals(UserDao.getCurrentUserId()))
+    public boolean insertOrReplace(GlucoseEntity glucoseEntity){
+        if(!isExistSameItem(glucoseEntity)) {
+            Log.i("Table-----","true");
             glucoseEntityDao.insertOrReplace(glucoseEntity);
-        else {
-
+            return true;
         }
+        Log.i("Table-----","false");
+        return true;
     }
     /**插入一条记录，表里面要没有与之相同的记录
      *
@@ -134,8 +137,24 @@ public class GluTableController {
      * 按条件查询数据
      */
     public List<GlucoseEntity> searchByUserId(String userId){
-        List<GlucoseEntity> bpmEntities = (List<GlucoseEntity>) glucoseEntityDao.queryBuilder().where(GlucoseEntityDao.Properties.UserId.eq(userId)).list();
-        return bpmEntities;
+        List<GlucoseEntity> glucoseEntities = (List<GlucoseEntity>) glucoseEntityDao.queryBuilder().where(GlucoseEntityDao.Properties.UserId.eq(userId)).list();
+        return glucoseEntities;
+    }
+
+    /**
+     * 判断表中是否含有这个元素：判断依据是 时间相同，血糖值相同，用户相同
+     * @param entity
+     * @return 返回true则表示含有相同的元素，为false则表示没有
+     */
+    public boolean isExistSameItem(GlucoseEntity entity){
+        List<GlucoseEntity> glucoseEntities = (List<GlucoseEntity>) glucoseEntityDao.queryBuilder()
+                .where(GlucoseEntityDao.Properties.TimeDate.eq(entity.getTimeDate()))
+                .where(GlucoseEntityDao.Properties.GlucoseConcentration.eq(entity.getGlucoseConcentration())).list();
+        for(GlucoseEntity item : glucoseEntities){
+            if (null != item.getUserId() && item.getUserId().equals(entity.getUserId()))
+                return true;
+        }
+        return false;
     }
     /**
      * 查询所有数据
@@ -145,7 +164,7 @@ public class GluTableController {
         return glucoseEntities;
     }
 
-    public GlucoseEntity getBPM(String gluId){
+    public GlucoseEntity getGlu(String gluId){
         return glucoseEntityDao.queryBuilder().where(GlucoseEntityDao.Properties.GluId.eq(gluId)).build().unique();
     }
     /**

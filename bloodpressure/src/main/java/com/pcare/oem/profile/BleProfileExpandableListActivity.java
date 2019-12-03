@@ -52,11 +52,12 @@ import no.nordicsemi.android.support.v18.scanner.ScanCallback;
 import no.nordicsemi.android.support.v18.scanner.ScanResult;
 
 import com.pcare.bloodpressure.R;
+import com.pcare.common.base.BaseActivity;
 import com.pcare.oem.scanner.ExtendedBluetoothDevice;
 import com.pcare.oem.scanner.ScannerUtil;
 
 @SuppressWarnings("unused")
-public abstract class BleProfileExpandableListActivity extends ExpandableListActivity implements BleManagerCallbacks{
+public abstract class BleProfileExpandableListActivity extends BaseActivity implements BleManagerCallbacks{
 	private static final String TAG = "BaseProfileActivity";
 
 	private static final String SIS_CONNECTION_STATUS = "connection_status";
@@ -67,7 +68,6 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 
 	private TextView mDeviceNameView;
 	private Button mConnectButton;
-	private ILogSession mLogSession;
 
 	private boolean mDeviceConnected = false;
 	private String mDeviceName;
@@ -83,7 +83,13 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 			for(ScanResult result : results){
 				if("C2:18:08:06:2D:46".equals(result.getDevice().getAddress())){
 					final ExtendedBluetoothDevice d = new ExtendedBluetoothDevice(result);
-					onDeviceSelected(d.device,d.name);
+					Log.i("aaaaaonDeviceFind------","   address"+d.device.getAddress()+"   name:"+d.name);
+					mDeviceName = d.name;
+					mBleManager.connect(d.device)
+							.useAutoConnect(false)//是否自动连接
+							.retry(3, 100)
+							.enqueue();
+					return;
 				}
 			}
 		}
@@ -101,18 +107,10 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 		if (!isBLEEnabled()) {
 			showBLEDialog();
 		}
-
 		mBleManager = initializeManager();
-
-		onCreateView(savedInstanceState);
-
 		setUpView();
 		onConnectClicked(null);
 	}
-
-	protected abstract void onCreateView(final Bundle savedInstanceState);
-
-
 	/**
 	 * Called after the view and the toolbar has been created.
 	 */
@@ -127,131 +125,28 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 		super.onBackPressed();
 	}
 
-	@Override
-	protected void onSaveInstanceState(final Bundle outState) {
-		super.onSaveInstanceState(outState);
-		outState.putBoolean(SIS_CONNECTION_STATUS, mDeviceConnected);
-		outState.putString(SIS_DEVICE_NAME, mDeviceName);
-	}
-
-	@Override
-	protected void onRestoreInstanceState(final @NonNull Bundle savedInstanceState) {
-		super.onRestoreInstanceState(savedInstanceState);
-		mDeviceConnected = savedInstanceState.getBoolean(SIS_CONNECTION_STATUS);
-		mDeviceName = savedInstanceState.getString(SIS_DEVICE_NAME);
-
-		if (mDeviceConnected) {
-			mConnectButton.setText(R.string.action_disconnect);
-		} else {
-			mConnectButton.setText(R.string.action_connect);
-		}
-	}
-
-	@Override
-	public boolean onCreateOptionsMenu(final Menu menu) {
-//		getMenuInflater().inflate(R.menu.help, menu);
-		return true;
-	}
-
-	/**
-	 * Use this method to handle menu actions other than home and about.
-	 *
-	 * @param itemId the menu item id
-	 * @return <code>true</code> if action has been handled
-	 */
-	@SuppressWarnings("unused")
-	protected boolean onOptionsItemSelected(final int itemId) {
-		// Overwrite when using menu other than R.menu.help
-		return false;
-	}
-
-	@Override
-	public boolean onOptionsItemSelected(final MenuItem item) {
-		final int id = item.getItemId();
-		switch (id) {
-			case android.R.id.home:
-				onBackPressed();
-				break;
-//			case R.id.action_about:
-//				final AppHelpFragment fragment = AppHelpFragment.getInstance(getAboutTextId());
-//				fragment.show(getSupportFragmentManager(), "help_fragment");
-//				break;
-			default:
-				return onOptionsItemSelected(id);
-		}
-		return true;
-	}
-
 	/**
 	 * Called when user press CONNECT or DISCONNECT button. See layout files -> onClick attribute.
 	 */
 	public void onConnectClicked(final View view) {
-		if (isBLEEnabled()) {
 			if (!mDeviceConnected) {
-				setDefaultUI();
-				showDeviceScanningDialog(getFilterUUID());
+				runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						ScannerUtil.getInstance().onCreate(getApplicationContext(),getFilterUUID(),scanCallback);
+					}
+				});
 			} else {
 				mBleManager.disconnect().enqueue();
 			}
-		} else {
-			showBLEDialog();
-		}
-	}
 
-	/**
-	 * Returns the title resource id that will be used to create logger session. If 0 is returned (default) logger will not be used.
-	 *
-	 * @return the title resource id
-	 */
-	protected int getLoggerProfileTitle() {
-		return 0;
 	}
-
-	/**
-	 * This method may return the local log content provider authority if local log sessions are supported.
-	 *
-	 * @return local log session content provider URI
-	 */
-	protected Uri getLocalAuthorityLogger() {
-		return null;
-	}
-
-	/**
-	 * This method returns whether autoConnect option should be used.
-	 *
-	 * @return true to use autoConnect feature, false (default) otherwise.
-	 */
-	protected boolean shouldAutoConnect() {
-		return true;
-	}
-
-	public void onDeviceSelected(final BluetoothDevice device, final String name) {
-		final int titleId = getLoggerProfileTitle();
-		Log.i("aaaaaaaabbbbbbbbbbbbb","onDeviceSelected:");
-		if (titleId > 0) {
-			mLogSession = Logger.newSession(getApplicationContext(), getString(titleId), device.getAddress(), name);
-			Log.i("onDeviceSelected------","titleId:"+getString(titleId)+"   address"+device.getAddress()+"   name:"+name);
-			// If nRF Logger is not installed we may want to use local logger
-			if (mLogSession == null && getLocalAuthorityLogger() != null) {
-				mLogSession = LocalLogSession.newSession(getApplicationContext(), getLocalAuthorityLogger(), device.getAddress(), name);
-			}
-		}
-		mDeviceName = name;
-		mBleManager.setLogger(mLogSession);
-		mBleManager.connect(device)
-				.useAutoConnect(shouldAutoConnect())
-				.retry(3, 100)
-				.enqueue();
-	}
-
 
 	@Override
 	public void onDeviceConnecting(@NonNull final BluetoothDevice device) {
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				Log.i("aaaaaaaabbbbbbbbbbbbb","onDeviceConnecting:");
-				mDeviceNameView.setText(mDeviceName != null ? mDeviceName : BleProfileExpandableListActivity.this.getString(R.string.not_available));
 				mConnectButton.setText(R.string.action_connecting);
 			}
 		});
@@ -263,12 +158,10 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				Log.i("aaaaaaaabbbbbbbbbbbbb","onDeviceConnected:");
 				mConnectButton.setText(R.string.action_disconnect);
 			}
 		});
 	}
-
 	@Override
 	public void onDeviceDisconnecting(@NonNull final BluetoothDevice device) {
 		runOnUiThread(new Runnable() {
@@ -286,7 +179,6 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 		runOnUiThread(new Runnable() {
 			@Override
 			public void run() {
-				Log.i("aaaaaaaabbbbbbbbbbbbb","onDeviceDisconnected:");
 				mConnectButton.setText(R.string.action_connect);
 				mDeviceNameView.setText(BleProfileExpandableListActivity.this.getDefaultDeviceName());
 			}
@@ -315,7 +207,6 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 
 	@Override
 	public void onBonded(@NonNull final BluetoothDevice device) {
-		Log.i("aaaaaaaabbbbbbbbbbbbb","onBonded:");
 		showToast(R.string.bonded);
 	}
 
@@ -385,11 +276,6 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 	protected abstract LoggableBleManager<? extends BleManagerCallbacks> initializeManager();
 
 	/**
-	 * Restores the default UI before reconnecting
-	 */
-	protected abstract void setDefaultUI();
-
-	/**
 	 * Returns the default device name resource id. The real device name is obtained when connecting to the device. This one is used when device has
 	 * disconnected.
 	 *
@@ -411,31 +297,7 @@ public abstract class BleProfileExpandableListActivity extends ExpandableListAct
 	 * @return the required UUID or <code>null</code>
 	 */
 	protected abstract UUID getFilterUUID();
-	/**
-	 * Shows the scanner fragment.
-	 *
-	 * @param filter               the UUID filter used to filter out available devices. The fragment will always show all bonded devices as there is no information about their
-	 *                             services
-	 * @see #getFilterUUID()
-	 */
-	private void showDeviceScanningDialog(final UUID filter) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				ScannerUtil.getInstance().onCreate(getApplicationContext(),filter,scanCallback);
-//				dialog.show(BleProfileExpandableListActivity.this.getSupportFragmentManager(), "scan_fragment");
-			}
-		});
-	}
 
-	/**
-	 * Returns the log session. Log session is created when the device was selected using the {@link ScannerUtil} and released when user press DISCONNECT.
-	 *
-	 * @return the logger session or <code>null</code>
-	 */
-	protected ILogSession getLogSession() {
-		return mLogSession;
-	}
 
 	private void ensureBLESupported() {
 		if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {

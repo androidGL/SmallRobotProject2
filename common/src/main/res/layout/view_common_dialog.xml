@@ -17,7 +17,7 @@
         android:gravity="center"
         android:textColor="#38ADFF"
         android:textSize="@dimen/title_size"
-        tools:text="消息提示" />
+        android:text="提示" />
 
     <TextView
         android:id="@+id/tv_message"

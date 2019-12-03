@@ -90,14 +90,16 @@ public class ScannerUtil {
 		}
 	}
 	private void startScan() {
+		if(mIsScanning)
+			return;
 		final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
 		final ScanSettings settings = new ScanSettings.Builder()
 				.setLegacy(false)
 				.setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY).setReportDelay(1000).setUseHardwareBatchingIfSupported(false).build();
 		final List<ScanFilter> filters = new ArrayList<>();
 		filters.add(new ScanFilter.Builder().setServiceUuid(mUuid).build());
-		scanner.startScan(filters, settings, scanCallback);
 
+		scanner.startScan(filters, settings, scanCallback);
 		mIsScanning = true;
 		mHandler.postDelayed(new Runnable() {
 			@Override
@@ -114,10 +116,8 @@ public class ScannerUtil {
 	 */
 	private void stopScan() {
 		if (mIsScanning) {
-
 			final BluetoothLeScannerCompat scanner = BluetoothLeScannerCompat.getScanner();
 			scanner.stopScan(scanCallback);
-
 			mIsScanning = false;
 		}
 	}

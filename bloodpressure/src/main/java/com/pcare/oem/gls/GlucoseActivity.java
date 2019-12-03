@@ -24,19 +24,18 @@ package com.pcare.oem.gls;
 import android.bluetooth.BluetoothDevice;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+
 import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
-import android.util.SparseArray;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.BaseExpandableListAdapter;
-import android.widget.PopupMenu;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -45,173 +44,113 @@ import com.pcare.bloodpressure.R;
 import com.pcare.common.base.IPresenter;
 import com.pcare.common.entity.GlucoseEntity;
 import com.pcare.common.table.GluTableController;
-import com.pcare.common.table.UserDao;
-import com.pcare.common.view.UserListDialog;
+import com.pcare.common.view.CommonAlertDialog;
+import com.pcare.oem.battery.BatteryManagerCallbacks;
 import com.pcare.oem.profile.BleProfileExpandableListActivity;
 import com.pcare.oem.profile.LoggableBleManager;
 
 @Route(path = "/glu/main")
-public class GlucoseActivity extends BleProfileExpandableListActivity implements  GlucoseManagerCallbacks {
+public class GlucoseActivity extends BleProfileExpandableListActivity implements BatteryManagerCallbacks {
 
-	private BaseExpandableListAdapter mAdapter;
-	private GlucoseManager mGlucoseManager;
-	private TextView mBatteryLevelView;
-	private RelativeLayout gluBatteryView;
+    private GlucoseRecycleAdapter recycleAdapter;
+    private GlucoseManager mGlucoseManager;
+    private TextView mBatteryLevelView;
+    private RelativeLayout gluBatteryView;
+    private RecyclerView mRecyclerView;
+    private List<GlucoseEntity> glucoseEntityList = new ArrayList<>();
 
+    @Override
+    protected void initView() {
+        super.initView();
+        if (!ensureBLEExists())
+            finish();
+        mBatteryLevelView = findViewById(R.id.battery);
+        gluBatteryView = findViewById(R.id.glu_battery);
+        mRecyclerView = findViewById(R.id.list);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getSelfActivity()));
+    }
 
-	@Override
-	protected void onCreateView(final Bundle savedInstanceState) {
-		if (!ensureBLEExists())
-			finish();
-		setGUI();
-	}
-
-	private void setGUI() {
-		mBatteryLevelView = findViewById(R.id.battery);
-		gluBatteryView = findViewById(R.id.glu_battery);
-
-		setListAdapter(mAdapter = new ExpandableRecordAdapter(this, mGlucoseManager));
+    @Override
+    public void start() {
+        super.start();
+        glucoseEntityList = GluTableController.getInstance(getSelfActivity()).searchAll();
+        recycleAdapter = new GlucoseRecycleAdapter(getSelfActivity(), glucoseEntityList);
+        mRecyclerView.setAdapter(recycleAdapter);
         testHistory();
-	}
+    }
 
-	@Override
-	protected LoggableBleManager<GlucoseManagerCallbacks> initializeManager() {
-		GlucoseManager manager = mGlucoseManager = GlucoseManager.getGlucoseManager(getApplicationContext());
-		manager.setGattCallbacks(this);
-		Log.i("aaaaaaaaaaaaaaa","initializeManager:");
-		return manager;
-	}
+    @Override
+    protected LoggableBleManager<BatteryManagerCallbacks> initializeManager() {
+        GlucoseManager manager = mGlucoseManager = GlucoseManager.getGlucoseManager(getApplicationContext()).setCallBack(entity -> {
+            glucoseEntityList.add(entity);
+            recycleAdapter.notifyDataSetChanged();
+        });
+        manager.setGattCallbacks(this);
+        return manager;
+    }
 
-	@Override
-	protected int getLoggerProfileTitle() {
-		return R.string.gls_feature_title;
-	}
+    @Override
+    protected int getAboutTextId() {
+        return R.string.gls_about_text;
+    }
 
-	@Override
-	protected int getAboutTextId() {
-		return R.string.gls_about_text;
-	}
+    @Override
+    protected int getDefaultDeviceName() {
+        return R.string.gls_default_name;
+    }
 
-	@Override
-	protected int getDefaultDeviceName() {
-		return R.string.gls_default_name;
-	}
+    @Override
+    protected UUID getFilterUUID() {
+        return GlucoseManager.GLS_SERVICE_UUID;
+    }
 
-	@Override
-	protected UUID getFilterUUID() {
-		return GlucoseManager.GLS_SERVICE_UUID;
-	}
+    @Override
+    public void onBatteryLevelChanged(@NonNull final BluetoothDevice device, final int batteryLevel) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                mBatteryLevelView.setText(GlucoseActivity.this.getString(R.string.battery, batteryLevel));
+                gluBatteryView.setVisibility(View.VISIBLE);
+            }
+        });
+    }
 
-	@Override
-	protected void setDefaultUI() {
-		mGlucoseManager.clear();
-		mBatteryLevelView.setText(R.string.not_available);
-	}
-
-	@Override
-	public void onDeviceDisconnected(@NonNull final BluetoothDevice device) {
-		super.onDeviceDisconnected(device);
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mBatteryLevelView.setText(R.string.not_available);
-				gluBatteryView.setVisibility(View.GONE);
-				Log.i("aaaaaaaaaaaaaaa","onDeviceDisconnected:");
-			}
-		});
-	}
-
-	@Override
-	public void onOperationStarted(final BluetoothDevice device) {
-		Log.i("aaaaaaaaaaaaaaa","onOperationStarted:");
-	}
-
-	@Override
-	public void onOperationCompleted(final BluetoothDevice device) {
-
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Log.i("aaaaaaaaaaaaaaa","onOperationCompleted:");
-				mAdapter.notifyDataSetChanged();
-			}
-		});
-	}
-
-	@Override
-	public void onOperationFailed(BluetoothDevice device) {
-		Log.i("aaaaaaaaaaaaaaa","onOperationFailed:");
-	}
-
-	@Override
-	public void onOperationAborted(final BluetoothDevice device) {
-		Log.i("aaaaaaaaaaaaaaa","onOperationAborted:");
-	}
-
-	@Override
-	public void onOperationNotSupported(final BluetoothDevice device) {
-		showToast(R.string.gls_operation_not_supported);
-	}
-	@Override
-	public void onDatasetChanged(final BluetoothDevice device) {
-		// Do nothing. Refreshing the list is done in onOperationCompleted
-		Log.i("aaaaaaaaaaaaaaa","onDatasetChanged:"+device.getAddress()+device.getName());
-	}
-
-	@Override
-	public void onNumberOfRecordsRequested(final BluetoothDevice device, final int value) {
-		if (value == 0)
-			showToast(R.string.gls_progress_zero);
-		else
-			showToast(getResources().getQuantityString(R.plurals.gls_progress, value, value));
-	}
-
-	@Override
-	public void onBatteryLevelChanged(@NonNull final BluetoothDevice device, final int batteryLevel) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				Log.i("aaaaaaaaaaaaaaa","onBatteryLevelChanged:"+batteryLevel);
-				mBatteryLevelView.setText(GlucoseActivity.this.getString(R.string.battery, batteryLevel));
-				gluBatteryView.setVisibility(View.VISIBLE);
-					mGlucoseManager.getAllRecords();
-
-			}
-		});
-	}
-
-	private boolean ensureBLEExists() {
-		if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
-			Toast.makeText(this, R.string.no_ble, Toast.LENGTH_LONG).show();
-			return false;
-		}
-		return true;
-	}
-
-	@Override
-	public int getLayoutId() {
-		return R.layout.activity_feature_gls;
-	}
-
-	@Override
-	protected IPresenter bindPresenter() {
-		return null;
-	}
-
-
-	public void back(View v){
-		finish();
-	}
-
-
-	public void refreshData(View view) {
-		mGlucoseManager.refreshRecords();
-	}
-
-	public void testHistory(){
-        List<GlucoseEntity> list = GluTableController.getInstance(getSelfActivity()).searchAll();
-        for (GlucoseEntity entity : list){
-            Log.i("Table-----",entity.toString());
+    private boolean ensureBLEExists() {
+        if (!getPackageManager().hasSystemFeature(PackageManager.FEATURE_BLUETOOTH_LE)) {
+            Toast.makeText(this, R.string.no_ble, Toast.LENGTH_LONG).show();
+            return false;
         }
+        return true;
+    }
+
+    @Override
+    public int getLayoutId() {
+        return R.layout.activity_feature_gls;
+    }
+
+    @Override
+    protected IPresenter bindPresenter() {
+        return null;
+    }
+
+    public void refreshData(View view) {
+        mGlucoseManager.refreshRecords();
+    }
+
+    public void testHistory() {
+        List<GlucoseEntity> list = GluTableController.getInstance(getSelfActivity()).searchAll();
+        for (GlucoseEntity entity : list) {
+            Log.i("Table-----", entity.getGluId() + entity.toString());
+        }
+    }
+
+    public void deleteAll(View view) {
+        CommonAlertDialog.Builder(getSelfActivity())
+                .setMessage("确认清空记录？")
+                .setOnConfirmClickListener(view1 -> {
+                    GluTableController.getInstance(getSelfActivity()).clear();
+                    glucoseEntityList.clear();
+                    recycleAdapter.notifyDataSetChanged();
+                }).build().shown();
     }
 }

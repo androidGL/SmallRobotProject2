@@ -39,8 +39,6 @@ import no.nordicsemi.android.ble.common.callback.bps.IntermediateCuffPressureDat
 import no.nordicsemi.android.ble.data.Data;
 import no.nordicsemi.android.log.LogContract;
 import com.pcare.oem.battery.BatteryManager;
-import com.pcare.oem.parser.BloodPressureMeasurementParser;
-import com.pcare.oem.parser.IntermediateCuffPressureParser;
 
 @SuppressWarnings({"unused", "WeakerAccess"})
 public class BPMManager extends BatteryManager<BPMManagerCallbacks> {
@@ -89,7 +87,7 @@ public class BPMManager extends BatteryManager<BPMManagerCallbacks> {
 					.with(new IntermediateCuffPressureDataCallback() {
 							  @Override
 							  public void onDataReceived(@NonNull final BluetoothDevice device, @NonNull final Data data) {
-								  log(LogContract.Log.Level.APPLICATION, "\"" + IntermediateCuffPressureParser.parse(data) + "\" received");
+//								  log(LogContract.Log.Level.APPLICATION, "\"" + IntermediateCuffPressureParser.parse(data) + "\" received");
 
 								  // Pass through received data
 								  super.onDataReceived(device, data);
@@ -112,7 +110,7 @@ public class BPMManager extends BatteryManager<BPMManagerCallbacks> {
 					.with(new BloodPressureMeasurementDataCallback() {
 						@Override
 						public void onDataReceived(@NonNull final BluetoothDevice device, @NonNull final Data data) {
-							log(LogContract.Log.Level.APPLICATION, "\"" + BloodPressureMeasurementParser.parse(data) + "\" received");
+//							log(LogContract.Log.Level.APPLICATION, "\"" + BloodPressureMeasurementParser.parse(data) + "\" received");
 
 							// Pass through received data
 							super.onDataReceived(device, data);
