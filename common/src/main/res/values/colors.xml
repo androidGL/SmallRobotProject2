@@ -7,6 +7,11 @@
     <color name="text_color">#666666</color>
     <color name="bottom_btn_color">#00688B</color>
 
+    //OEM
+    <color name="backgroundColor">#FFD9E1E2</color>
+    <color name="headerBackgroundColor">#FF00A9CE</color>
+    <color name="headerTextColor">@color/white</color>
+
     <color name="main_gray_color">#F5F5F5</color>
     <color name="head_chat">#698B22</color>
     <color name="start_look">#C1FFC1</color>

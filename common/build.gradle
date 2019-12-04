@@ -74,4 +74,11 @@ dependencies {
     implementation files('libs/Msc.jar')
 
     api rootProject.ext.dependencies["greendao"]
+
+
+    //以下是OEM的包
+    api 'no.nordicsemi.android:log:2.2.0'
+    api 'no.nordicsemi.android.support.v18:scanner:1.4.0'
+    api 'no.nordicsemi.android:dfu:1.9.0'
+    api 'no.nordicsemi.android:ble-common:2.1.1'
 }

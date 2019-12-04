@@ -9,18 +9,9 @@
         android:allowBackup="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity">
-            <!--<intent-filter>-->
-                <!--<action android:name="android.intent.action.MAIN" />-->
-
-                <!--<category android:name="android.intent.category.LAUNCHER" />-->
-            <!--</intent-filter>-->
-        </activity>
         <!--血压-->
-        <activity android:name="com.pcare.oem.bpm.BPMActivity" />
-        <!--血糖-->
-        <activity android:name="com.pcare.oem.gls.GlucoseActivity" />
-        <activity android:name="com.pcare.oem.bpm.BPMHistoryActivity" />
+        <activity android:name=".activity.BPMActivity" />
+        <activity android:name=".activity.BPMHistoryActivity" />
     </application>
 
 </manifest>
