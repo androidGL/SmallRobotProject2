@@ -78,6 +78,10 @@ public class BPMHistoryActivity extends BaseActivity {
             }
         });
     }
+
+    public void toChartActivity(View view) {
+    }
+
     private class ItemHolder extends RecyclerView.ViewHolder{
         private TextView timeView,systolicView,diastolicView,meanAPView,pulseView;
         public ItemHolder(View itemView) {

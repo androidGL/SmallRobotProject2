@@ -17,6 +17,19 @@
             android:text="血压记录"
             android:textColor="@color/title_text"
             android:textSize="@dimen/title_size" />
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="@dimen/title_height_top"
+            android:onClick="back"
+            android:padding="10dp"
+            android:src="@mipmap/back" />
+        <ImageView
+            android:layout_width="40dp"
+            android:layout_height="@dimen/title_height_top"
+            android:onClick="toChartActivity"
+            android:padding="5dp"
+            android:layout_alignParentRight="true"
+            android:src="@mipmap/wave" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView

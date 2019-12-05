@@ -29,5 +29,12 @@
         android:background="#eeeeee"
         android:hint="ID"
         android:layout_gravity="center_horizontal"/>
+    <com.pcare.common.view.CurveTrendChartView
+        android:id="@+id/curve_view"
+        android:layout_width="match_parent"
+        android:layout_margin="20dp"
+        android:layout_height="600dp"
+        android:background="#eeeeee"
+        android:layout_gravity="center"/>
 
 </LinearLayout>

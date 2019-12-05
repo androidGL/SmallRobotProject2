@@ -121,7 +121,7 @@ public class StartActivity extends BaseActivity {
     protected void onResume() {
         super.onResume();
         recycleView();
-        test();
+//        test();
     }
 
     public void recycleView() {

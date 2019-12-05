@@ -14,7 +14,7 @@ public class CommonUtil {
             return "暂无数据";
         }
         if (format == null || format.isEmpty()) {
-            format = "yyyy-MM-dd HH:mm:ss";
+            format = "yyyy-MM-dd  HH:mm:ss";
         }
         SimpleDateFormat formatter = new SimpleDateFormat(format);
         return formatter.format(date);
