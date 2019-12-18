@@ -41,4 +41,9 @@
     <string name="bpm_timestamp">%1$tT %1$te.%1$tm.%1$tY</string>
     
     <string name="bpm_default_name">DEFAULT BPM</string>
+    <string name="systolic_top">140</string>
+    <string name="systolic_bottom">120</string>
+    <string name="diastolic_top">90</string>
+    <string name="diastolic_bottom">80</string>
+
 </resources>

@@ -36,5 +36,6 @@
     <string name="bonding">Bonding with the device&#8230;</string>
     <string name="bonded">The device is now bonded.</string>
     <string name="bonding_failed">Bonding failed.</string>
+    <string name="health_tip">建议您平时生活，注意低盐、低脂饮食；多吃蔬菜水果；注意补充钾、钙；限酒、戒烟，减轻工作压力、精神压力；控制体重，适量运动；定期监测血压。如血压仍然异常，请及时到医院就诊。</string>
 
 </resources>

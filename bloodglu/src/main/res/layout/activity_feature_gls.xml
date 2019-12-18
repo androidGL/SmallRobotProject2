@@ -25,7 +25,8 @@
             android:layout_height="@dimen/title_right_png"
             android:layout_alignParentRight="true"
             android:paddingRight="10dp"
-            android:src="@mipmap/history" />
+            android:onClick="toTrendChartActivity"
+            android:src="@mipmap/wave" />
 
         <ImageView
             android:layout_width="40dp"
@@ -96,9 +97,9 @@
                     style="@style/Widget.ListTitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/main_text_size"
                     android:padding="8dp"
-                    android:text="@string/gls_section_data" />
+                    android:text="@string/gls_section_data"
+                    android:textSize="@dimen/main_text_size" />
 
                 <ImageView
                     android:layout_width="30dp"

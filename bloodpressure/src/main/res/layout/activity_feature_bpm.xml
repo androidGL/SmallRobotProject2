@@ -64,6 +64,14 @@
             android:text="@string/bpm_default_name"
             android:textAllCaps="true"
             android:textAppearance="?android:attr/textAppearanceLarge" />
+        <Button
+            android:id="@+id/action_connect"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginLeft="20dp"
+            android:onClick="onConnectClicked"
+            android:text="@string/action_connect" />
 
     </LinearLayout>
     <include
@@ -263,13 +271,5 @@
             android:textSize="22sp" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/action_connect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/feature_vertical_margin_top"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="@dimen/activity_vertical_margin_bottom"
-        android:onClick="onConnectClicked"
-        android:text="@string/action_connect" />
+
 </LinearLayout>

@@ -1,5 +1,7 @@
 package com.pcare.bloodpressure.activity;
 
+import android.content.Intent;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +20,7 @@ import com.pcare.common.table.BPMTableController;
 import com.pcare.common.table.UserDao;
 import com.pcare.common.util.CommonUtil;
 
+import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -69,6 +72,18 @@ public class BPMHistoryActivity extends BaseActivity {
                     ((ItemHolder) holder).diastolicView.setText(entity.getDiastolicData()+entity.getUnit());
                     ((ItemHolder) holder).meanAPView.setText(entity.getMeanAPData()+entity.getUnit());
                     ((ItemHolder) holder).pulseView.setText(entity.getPulseData()+"bpm");
+                    if(Double.parseDouble(entity.getSystolicData())>Double.parseDouble(getResources().getString(R.string.systolic_top))
+                    ||Double.parseDouble(entity.getDiastolicData())>Double.parseDouble(getResources().getString(R.string.diastolic_top))){
+                        ((ItemHolder) holder).typeView.setText("高压");
+                        ((ItemHolder) holder).typeView.setBackgroundResource(R.mipmap.circle_not_normal);
+                    }else  if(Double.parseDouble(entity.getSystolicData())<Double.parseDouble(getResources().getString(R.string.systolic_bottom))
+                            ||Double.parseDouble(entity.getDiastolicData())<Double.parseDouble(getResources().getString(R.string.diastolic_bottom))){
+                        ((ItemHolder) holder).typeView.setText("低压");
+                        ((ItemHolder) holder).typeView.setBackgroundResource(R.mipmap.circle_not_normal2);
+                    }else {
+                        ((ItemHolder) holder).typeView.setText("正常");
+                        ((ItemHolder) holder).typeView.setBackgroundResource(R.mipmap.circle_normal);
+                    }
                 }
             }
 
@@ -80,10 +95,11 @@ public class BPMHistoryActivity extends BaseActivity {
     }
 
     public void toChartActivity(View view) {
+        startActivity(new Intent(this,BPMTrendChartActivity.class));
     }
 
     private class ItemHolder extends RecyclerView.ViewHolder{
-        private TextView timeView,systolicView,diastolicView,meanAPView,pulseView;
+        private TextView timeView,systolicView,diastolicView,meanAPView,pulseView,typeView;
         public ItemHolder(View itemView) {
             super(itemView);
             timeView = itemView.findViewById(R.id.bpm_time);
@@ -91,6 +107,8 @@ public class BPMHistoryActivity extends BaseActivity {
             diastolicView = itemView.findViewById(R.id.bpm_diastolic);
             meanAPView = itemView.findViewById(R.id.bpm_mean_ap);
             pulseView = itemView.findViewById(R.id.bpm_pulse);
+            typeView = itemView.findViewById(R.id.bpm_type);
+
         }
     }
 }

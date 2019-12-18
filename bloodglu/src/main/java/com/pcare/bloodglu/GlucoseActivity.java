@@ -22,6 +22,7 @@
 package com.pcare.bloodglu;
 
 import android.bluetooth.BluetoothDevice;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.util.Log;
 import android.view.View;
@@ -148,5 +149,9 @@ public class GlucoseActivity extends BleProfileExpandableListActivity implements
                     glucoseEntityList.clear();
                     recycleAdapter.notifyDataSetChanged();
                 }).build().shown();
+    }
+
+    public void toTrendChartActivity(View view) {
+        startActivity(new Intent(GlucoseActivity.this,GluTrendChartActivity.class));
     }
 }

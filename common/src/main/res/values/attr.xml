@@ -18,8 +18,10 @@
     <declare-styleable name="CurveTrendChartView">
         <attr name="lineColor" format="reference"/>
         <attr name="text" />
-        <attr name="textSize" />
-        <attr name="textColor" />
+        <attr name="xTextSize" format="dimension"/>
+        <attr name="yTextSize" format="dimension"/>
+        <attr name="xTextColor" format="color" />
+        <attr name="yTextColor" format="color" />
     </declare-styleable>
 
 </resources>

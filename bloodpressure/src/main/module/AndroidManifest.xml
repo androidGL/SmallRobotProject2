@@ -12,6 +12,7 @@
         <!--血压-->
         <activity android:name=".activity.BPMActivity" />
         <activity android:name=".activity.BPMHistoryActivity" />
+        <activity android:name=".activity.BPMTrendChartActivity" />
     </application>
 
 </manifest>

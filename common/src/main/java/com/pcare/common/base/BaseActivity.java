@@ -27,6 +27,7 @@ public abstract class BaseActivity<P extends IPresenter> extends Activity implem
         setContentView(getLayoutId());
         ARouter.getInstance().inject(this);
         initView();
+        initData();
         ButterKnife.bind(this);
         presenter = bindPresenter();
         start();
@@ -46,6 +47,9 @@ public abstract class BaseActivity<P extends IPresenter> extends Activity implem
     }
 
     protected void initView() {
+
+    }
+    protected void initData(){
 
     }
 

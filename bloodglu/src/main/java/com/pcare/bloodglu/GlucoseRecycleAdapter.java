@@ -46,7 +46,7 @@ public class GlucoseRecycleAdapter extends RecyclerView.Adapter {
                 ((GluViewHolder) holder).detailsView.setText(mContext.getResources().getStringArray(R.array.gls_type)[0]);
             }
             ((GluViewHolder) holder).concentrationView.setText(mContext.getString(R.string.gls_value,
-                    Float.parseFloat(glucoseEntities.get(position).getGlucoseConcentration()) * 100000.0f)+mContext.getString(R.string.gls_unit_mmolpl));
+                    Float.parseFloat(glucoseEntities.get(position).getGlucoseConcentration()) * 1000.0f)+mContext.getString(R.string.gls_unit_mmolpl));
             try {
                 ((GluViewHolder) holder).locationView.setText( mContext.getResources().getStringArray(R.array.gls_location)[glucoseEntities.get(position).getSampleLocation()]);
             } catch (final ArrayIndexOutOfBoundsException e) {
