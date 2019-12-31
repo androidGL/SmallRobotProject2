@@ -50,6 +50,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.ResponseBody;
+import retrofit2.http.Field;
 
 /**
  * @Author: gl
@@ -77,6 +78,8 @@ public class FaceUtil {
     private FaceDetectListener faceDetectListener;
     private FaceCompareListener faceCompareListener;
     private String faceUrl, userId;
+    private String ugroup = "ASDFG1234";
+    private boolean isOpen = true;
 
 
     public interface FaceDetectListener {
@@ -86,7 +89,7 @@ public class FaceUtil {
     }
 
     public interface FaceCompareListener {
-        void compareSucess();
+        void compareSucess(String userId);
 
         void compareFail();
     }
@@ -325,13 +328,15 @@ public class FaceUtil {
             RetrofitHelper.getInstance()
                     .getRetrofit()
                     .create(Api.class)
-                    .detectFace(userId, imgBase64)
+                    .detectFace(userId, imgBase64,ugroup)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.newThread())
                     .subscribeWith(new DisposableSingleObserver<ResponseBody>() {
 
                         @Override
                         public void onSuccess(ResponseBody response) {
+                            if(!isOpen)
+                                return;
                             JSONObject jsonObject;
                             try {
                                 String result = response.string();
@@ -350,7 +355,7 @@ public class FaceUtil {
 
                         @Override
                         public void onError(Throwable e) {
-
+                            e.printStackTrace();
                         }
                     });
         } else {
@@ -358,21 +363,23 @@ public class FaceUtil {
             RetrofitHelper.getInstance()
                     .getRetrofit()
                     .create(Api.class)
-                    .compareFace(imgBase64)
+                    .compareFace(imgBase64,ugroup)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.newThread())
                     .subscribeWith(new DisposableSingleObserver<ResponseBody>() {
 
                         @Override
                         public void onSuccess(ResponseBody response) {
+                            if(!isOpen)
+                                return;
                             JSONObject jsonObject;
                             try {
                                 String result = response.string();
-                                Log.i(TAG,"Response1111111111111:"+result);
                                 jsonObject = new JSONObject(result);
                                 if(jsonObject.optInt("status") == 1){
                                     timerHandler.removeCallbacks(timerRunnable);
-                                    faceDetectListener.detectSucess();
+
+                                    faceCompareListener.compareSucess(jsonObject.optJSONArray("data").optJSONObject(0).optString("uid"));
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -383,13 +390,14 @@ public class FaceUtil {
 
                         @Override
                         public void onError(Throwable e) {
-
+                            e.printStackTrace();
                         }
                     });
         }
     }
 
     public void closeSession() {
+        isOpen = false;
         if (mCameraCaptureSession != null) {
             mCameraCaptureSession.close();
             mCameraCaptureSession = null;

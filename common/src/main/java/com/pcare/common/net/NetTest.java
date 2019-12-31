@@ -28,13 +28,13 @@ public class NetTest {
      * @param url 需要拦截的URL
      * @return
      */
-    public static String isExist(HttpUrl url) {
+    public static String isExist(HttpUrl url,Object data) {
         //初始化apiResponse，添加键值对
         init();
         if(pathList.contains(url.encodedPath())){
             netResponse.setStatus(1);
             netResponse.setMsg("调用成功");
-            netResponse.setData(url.queryParameter("entity"));
+            netResponse.setData(data);
             return netResponse.toString();
         }
         return null;

@@ -140,7 +140,9 @@ public class StartActivity extends BaseActivity {
     }
 
     public void toCompareFace(View view) {
-        startActivity(new Intent(this, FaceActivity.class).putExtra("type", 1));
+        startActivity(new Intent(this, FaceActivity.class)
+                .putExtra("type", 1)
+        .putExtra("resource","login"));
     }
 
     private class ViewHolder extends RecyclerView.ViewHolder {

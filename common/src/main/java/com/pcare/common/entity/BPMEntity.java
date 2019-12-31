@@ -16,8 +16,8 @@ import org.greenrobot.greendao.annotation.Generated;
 public class BPMEntity {
     private String userId;//用户ID
     private String bpmId;//血压记录ID
-    private String systolicData; //高血压
-    private String diastolicData;//低血压
+    private String systolicData; //高压值
+    private String diastolicData;//低压值
     private String meanAPData;   //平均压
     private String unit;  //血压单位
     private String pulseData; //脉搏

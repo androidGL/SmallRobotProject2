@@ -41,7 +41,6 @@ public class CurveTrendChartView extends View {
      *
      */
 
-    private int type = 0;
     private Context mContext;
     //总宽高
     private int mWidth;
@@ -108,8 +107,8 @@ public class CurveTrendChartView extends View {
         this.mContext = context;
         TypedArray array = mContext.obtainStyledAttributes(attrs, R.styleable.CurveTrendChartView);
         mXTextSize = array.getDimensionPixelSize(R.styleable.CurveTrendChartView_xTextSize,mTextSize);
+        //TypedArray使用完一定要回收，否则会造成内存泄漏
         array.recycle();
-
     }
 
     private void initPaint() {
@@ -151,7 +150,7 @@ public class CurveTrendChartView extends View {
         mWidth = w;
         mHeight = h;
         mXWidth = mWidth - mYWidth;
-        mXItemWidth = (mWidth - mYWidth - mXUnitHeight) / mXDataList.size();
+        mXItemWidth = (mWidth - mYWidth - mXUnitHeight) / (float)mXDataList.size();
     }
 
     @Override
@@ -213,7 +212,7 @@ public class CurveTrendChartView extends View {
 
             //初始化y轴高度和每个的高度
             mYHeight = mHeight - mXHeight -mYUnitHeight- descHeight;
-            mYItemHeight = mYHeight / mYDataList.size();
+            mYItemHeight = mYHeight / (float)mYDataList.size();
 
             //在趋势表中绘制背景色
             for(BkgItem item : mBkgList){

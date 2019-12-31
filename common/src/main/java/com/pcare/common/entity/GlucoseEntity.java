@@ -32,11 +32,11 @@ import org.greenrobot.greendao.annotation.Id;
 @Entity
 public class GlucoseEntity {
 	@Id(autoincrement = true)
-	private Long gluId;//血压记录ID
+	private Long gluId;//血糖记录ID
 	private String userId;//用户ID
 	private int sequenceNumber;//序列号
 	private Date timeDate;//时间
-	private String glucoseConcentration;//血压值，默认0
+	private String glucoseConcentration;//血糖值，默认0
 	private int sampleType;//测量类型，默认0
 	private int sampleLocation;//测量位置，默认0
 	private int status;//状态码，默认0

@@ -43,11 +43,17 @@ public class UserDao {
         return currentUserId;
     }
 
-    public void setCurrentUser(UserEntity user){
+    public boolean setCurrentUser(UserEntity user){
         if(null != getCurrentUser())
             updateUser(getCurrentUser().setCurrentUser(false));
         updateUser(user.setCurrentUser(true));
         setCurrentUserId(user.getUserId());
+        return true;
+    }
+    public boolean setCurrentUser(String userId){
+        if (TextUtils.isEmpty(userId)||null == getUserById(userId))
+            return false;
+        return setCurrentUser(getUserById(userId));
     }
     public UserEntity getCurrentUser() {
         return UserTableController.getInstance(context).getCurrentUser();

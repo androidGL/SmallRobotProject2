@@ -27,7 +27,7 @@ public interface Api {
 
     //人脸识别的URL
     String URL_VALUE_FACE = "URL_VALUE_FACE";
-    String FACEURL = "http://192.168.2.196:8000/face";
+    String FACEURL = "http://192.168.2.181:8000/fl";
 
     //问诊的URL
     String URL_VALUE_QUESTION = "URL_VALUE_QUESTION";
@@ -43,21 +43,22 @@ public interface Api {
     Observable<ResponseBody> testNet(@Query("userName") String ip);//测试+Rxjava
 
     //注册用户
-    @Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
+//    @Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
     @POST("register")
-    Single<NetResponse<UserEntity>> register(@Body UserEntity userEntity);
+    @FormUrlEncoded
+    Single<NetResponse<UserEntity>> register(@Field("entity") UserEntity userEntity);
 
     //人脸注册
     @Headers({URL_KEY+":"+URL_VALUE_FACE})
     @POST("detect64")
     @FormUrlEncoded
-    Single<ResponseBody> detectFace(@Field("usr_id") String userId,@Field("image_base64") String imageBase64);
+    Single<ResponseBody> detectFace(@Field("usr_id") String userId,@Field("image_base64") String imageBase64,@Field("ugroup") String ugroup);
 
     //人脸识别
     @Headers({URL_KEY+":"+URL_VALUE_FACE})
     @POST("search64")
     @FormUrlEncoded
-    Single<ResponseBody> compareFace(@Field("image_base64") String imageBase64);
+    Single<ResponseBody> compareFace(@Field("image_base64") String imageBase64,@Field("ugroup") String ugroup);
 
     //问诊问题
     @Headers({URL_KEY+":"+URL_VALUE_QUESTION})

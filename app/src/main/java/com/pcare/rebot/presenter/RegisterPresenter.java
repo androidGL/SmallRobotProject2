@@ -1,8 +1,12 @@
 package com.pcare.rebot.presenter;
 
+import android.util.Log;
+
 import com.pcare.common.base.BasePresenter;
 import com.pcare.common.entity.NetResponse;
 import com.pcare.common.entity.UserEntity;
+import com.pcare.common.table.UserTableController;
+import com.pcare.common.util.LogUtil;
 import com.pcare.rebot.contract.RegisterContract;
 import com.pcare.rebot.model.RegisterModel;
 
@@ -25,6 +29,7 @@ public class RegisterPresenter extends BasePresenter<RegisterContract.View> impl
 
     @Override
     public void register(UserEntity u) {
+        u.setUserId("user"+ (UserTableController.getInstance(getView().getSelfActivity()).searchAll().size()+1));
         DisposableSingleObserver observer =new DisposableSingleObserver<NetResponse<UserEntity>>(){
 
             @Override
@@ -39,7 +44,7 @@ public class RegisterPresenter extends BasePresenter<RegisterContract.View> impl
 
             @Override
             public void onError(Throwable e) {
-
+                e.printStackTrace();
             }
         };
         addDisposable(observer);

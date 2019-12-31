@@ -1,12 +1,16 @@
 package com.pcare.rebot.activity;
 
+import android.content.Intent;
 import android.view.TextureView;
 import android.view.View;
+import android.widget.Toast;
 
 import com.pcare.common.base.BaseActivity;
 import com.pcare.common.base.IPresenter;
+import com.pcare.common.entity.UserEntity;
 import com.pcare.common.net.Api;
 import com.pcare.common.table.UserDao;
+import com.pcare.common.table.UserTableController;
 import com.pcare.common.util.FaceUtil;
 import com.pcare.rebot.R;
 
@@ -26,10 +30,14 @@ public class FaceActivity extends BaseActivity {
     public void start() {
         super.start();
         textureView = findViewById(R.id.look_container);
-        faceUtil = new FaceUtil(this,textureView)
+        faceUtil = new FaceUtil(this, textureView)
                 .setFaceDetectListener(new FaceUtil.FaceDetectListener() {
                     @Override
                     public void detectSucess() {
+                        if (getIntent().hasExtra("resource") && "register".equals(getIntent().getStringExtra("resource"))) {
+                            Toast.makeText(getApplicationContext(), "添加新用户成功", Toast.LENGTH_SHORT);
+                            startActivity(new Intent(FaceActivity.this, MainActivity.class));
+                        }
                         finish();
                     }
 
@@ -37,13 +45,32 @@ public class FaceActivity extends BaseActivity {
                     public void detectFail() {
 
                     }
+                })
+                .setFaceCompareListener(new FaceUtil.FaceCompareListener() {
+                    @Override
+                    public void compareSucess(String userId) {
+                        if (getIntent().hasExtra("resource") && "login".equals(getIntent().getStringExtra("resource"))) {
+                            if(UserDao.get(getSelfActivity()).setCurrentUser(userId)){
+                                Toast.makeText(getApplicationContext(), "登陆成功", Toast.LENGTH_SHORT);
+                                startActivity(new Intent(FaceActivity.this, MainActivity.class));
+                            }
+
+                        }
+
+                        finish();
+                    }
+
+                    @Override
+                    public void compareFail() {
+
+                    }
                 });
-        type = getIntent().getIntExtra("type",0);
-        if(type == 0){
+        type = getIntent().getIntExtra("type", 0);
+        if (type == 0) {
             faceUtil.init(Api.FACEURL, getIntent().getStringExtra("userId"));
 //            faceUtil.init(Api.FACEURL, UserDao.getCurrentUserId());
-        }else {
-            faceUtil.init(Api.FACEURL,null);
+        } else {
+            faceUtil.init(Api.FACEURL, null);
         }
     }
 
@@ -53,9 +80,10 @@ public class FaceActivity extends BaseActivity {
     }
 
     public void stop() {
-        if(null!=faceUtil)
+        if (null != faceUtil)
             faceUtil.closeSession();
     }
+
     public void back(View view) {
         stop();
         finish();

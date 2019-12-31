@@ -12,6 +12,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import okhttp3.FormBody;
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -102,7 +103,23 @@ public class RetrofitHelper {
             Request request = chain.request();
             final HttpUrl url = request.url();//获取路径
             //判断是否需要拦截，如果URL是需要拦截的URL，则会根据关键字apiNname进行拦截
-            String apiNname = NetTest.isExist(url);
+            String apiNname = null;
+            if("POST".equals(request.method())) {
+                if (request.body() instanceof FormBody) {
+                    FormBody oldFormBody = (FormBody) request.body();
+                    for (int i = 0; i < oldFormBody.size(); i++) {
+                        if (oldFormBody.encodedName(i).equals("entity")) {
+                            apiNname = NetTest.isExist(url,URLDecoder.decode(oldFormBody.encodedValue(i), "UTF-8"));
+                            break;
+                        }
+                    }
+                }
+            }else {
+                apiNname = NetTest.isExist(url,url.queryParameter("entity"));
+            }
+
+
+
             if(null != apiNname){
                 //返回需要拦截的请求要进行模拟的数据
                 return new Response.Builder()

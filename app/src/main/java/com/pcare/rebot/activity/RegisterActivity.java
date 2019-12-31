@@ -28,10 +28,10 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter> implements
 
     private TextView yearView;
     private ScreenCheckBox male, female;
-    private EditText infoName;
+    private EditText infoName, infoStature, infoWeight;
     private TextView infoTypeName;
     private TextView titleView;
-    private UserEntity userInfo;
+    private UserEntity mUserInfo;
     private int selectYear;
     private int userType;
     private String userTypeName;
@@ -54,6 +54,8 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter> implements
         male = findViewById(R.id.checkbox_male);
         female = findViewById(R.id.checkbox_female);
         infoName = findViewById(R.id.info_name);
+        infoStature = findViewById(R.id.info_stature);
+        infoWeight = findViewById(R.id.info_weight);
         infoTypeName = findViewById(R.id.info_type_name);
         titleView = findViewById(R.id.title);
     }
@@ -61,16 +63,17 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter> implements
     @Override
     public void start() {
         super.start();
-        userInfo = new UserEntity();
-        if(getIntent().hasExtra("userId")){
+        mUserInfo = new UserEntity();
+        if (getIntent().hasExtra("userId")) {
             type = "editUser";
             titleView.setText("修改用户信息");
-            userInfo = UserDao.get(getApplicationContext()).getUserById(getIntent().getStringExtra("userId"));
-            setViews(userInfo);
+            mUserInfo = UserDao.get(getApplicationContext()).getUserById(getIntent().getStringExtra("userId"));
+            setViews(mUserInfo);
         }
 
     }
-    private void setViews(UserEntity user){
+
+    private void setViews(UserEntity user) {
         yearView.setText(String.valueOf(user.getUserBirthYear()));
         infoName.setText(user.getUserName());
         setUserType(user.getUserType());
@@ -87,7 +90,7 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter> implements
         yearDialog.show();
     }
 
-    private void setUserType(int type){
+    private void setUserType(int type) {
         userType = type;
         switch (type) {
             case 0:
@@ -127,7 +130,10 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter> implements
                 .setMessage("为了更方便快捷的使用本设备，建议您进行人脸识别认证。")
                 .setOnConfirmClickListener(view1 -> {
                     //跳转人脸识别界面，type为0表示注册
-                    startActivity(new Intent(this, FaceActivity.class).putExtra("type",0));
+                    startActivity(new Intent(this, FaceActivity.class)
+                            .putExtra("type", 0)
+                            .putExtra("userId", userInfo.getUserId())
+                            .putExtra("resource", "register"));
                     finish();
                 })
                 .setOnCancleClickListener(view1 -> {
@@ -142,7 +148,7 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter> implements
 
     @Override
     public void editUser(UserEntity userEntity) {
-        UserDao.get(getApplicationContext()).updateUser(userInfo);
+        UserDao.get(getApplicationContext()).updateUser(mUserInfo);
         finish();
     }
 
@@ -155,14 +161,16 @@ public class RegisterActivity extends BaseActivity<RegisterPresenter> implements
             Toast.makeText(getApplicationContext(), "请您设置昵称", Toast.LENGTH_SHORT).show();
             return;
         }
-        userInfo.setUserName(infoName.getText().toString());
-        userInfo.setUserType(userType);
-        userInfo.setUserBirthYear(selectYear);
+        mUserInfo.setUserName(infoName.getText().toString());
+        mUserInfo.setUserType(userType);
+        mUserInfo.setUserBirthYear(selectYear);
+        mUserInfo.setUserWeight(infoWeight.getText().toString());
+        mUserInfo.setUserStature(infoStature.getText().toString());
 
-        if("register".equals(type))
-            presenter.register(userInfo);
+        if ("register".equals(type))
+            presenter.register(mUserInfo);
         else
-            presenter.editUser(userInfo);
+            presenter.editUser(mUserInfo);
 
     }
 }

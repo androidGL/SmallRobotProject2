@@ -20,12 +20,12 @@ public class UserEntity {
     private String userName;//昵称或真实姓名
     private String userStature;//身高: 173cm
     private String userWeight;//体重：50kg
-    private String userRebotId;//用户使用的机器人ID号或设备号
+    private String userRobotId;//用户使用的机器人ID号或设备号
     private boolean currentUser;//当前使用用户
-    @Generated(hash = 1974957160)
+    @Generated(hash = 12870467)
     public UserEntity(Long id, String userId, int userType, int userBirthYear,
             int userGender, String userName, String userStature, String userWeight,
-            String userRebotId, boolean currentUser) {
+            String userRobotId, boolean currentUser) {
         this.id = id;
         this.userId = userId;
         this.userType = userType;
@@ -34,7 +34,7 @@ public class UserEntity {
         this.userName = userName;
         this.userStature = userStature;
         this.userWeight = userWeight;
-        this.userRebotId = userRebotId;
+        this.userRobotId = userRobotId;
         this.currentUser = currentUser;
     }
     @Generated(hash = 1433178141)
@@ -82,12 +82,14 @@ public class UserEntity {
     public void setUserWeight(String userWeight) {
         this.userWeight = userWeight;
     }
-    public String getUserRebotId() {
-        return this.userRebotId;
+    public String getUserRobotId() {
+        return this.userRobotId;
     }
-    public void setUserRebotId(String userRebotId) {
-        this.userRebotId = userRebotId;
+    public void setUserRobotId(String userRobotId) {
+        this.userRobotId = userRobotId;
     }
+
+
     @Override
     public String toString() {
         return "{\"userId\":\""+getUserId() +
