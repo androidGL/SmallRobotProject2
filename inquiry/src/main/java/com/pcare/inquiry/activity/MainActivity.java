@@ -28,8 +28,10 @@ public class MainActivity extends BaseActivity {
         Intent intent = new Intent(this, SpeakActivity.class);
         if (view.getId() == R.id.request_type_select) {
             intent.putExtra("type", "select");
-        } else {
+        } else if (view.getId() == R.id.request_type_speak){
             intent.putExtra("type", "speak");
+        }else {
+            intent.putExtra("type", "ask");
         }
         startActivity(intent);
         finish();

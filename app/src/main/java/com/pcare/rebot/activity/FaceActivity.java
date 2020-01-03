@@ -1,6 +1,7 @@
 package com.pcare.rebot.activity;
 
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.view.TextureView;
 import android.view.View;
 import android.widget.Toast;
@@ -30,7 +31,7 @@ public class FaceActivity extends BaseActivity {
     public void start() {
         super.start();
         textureView = findViewById(R.id.look_container);
-        faceUtil = new FaceUtil(this, textureView)
+        faceUtil = new FaceUtil(this, textureView,this.getResources().getConfiguration().orientation)
                 .setFaceDetectListener(new FaceUtil.FaceDetectListener() {
                     @Override
                     public void detectSucess() {

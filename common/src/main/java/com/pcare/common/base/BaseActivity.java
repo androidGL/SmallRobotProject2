@@ -2,6 +2,7 @@ package com.pcare.common.base;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Window;
@@ -24,6 +25,8 @@ public abstract class BaseActivity<P extends IPresenter> extends Activity implem
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        //强制横屏显示
+//        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         setContentView(getLayoutId());
         ARouter.getInstance().inject(this);
         initView();

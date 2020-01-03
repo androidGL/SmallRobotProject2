@@ -69,7 +69,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/request_start_tip"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintWidth_percent="0.5">
+        app:layout_constraintWidth_percent="0.34">
         <ImageView
             android:layout_width="@dimen/inquiry_type_png"
             android:layout_height="@dimen/inquiry_type_png"
@@ -97,7 +97,7 @@
         app:layout_constraintStart_toEndOf="@id/request_type_select"
         app:layout_constraintTop_toBottomOf="@id/request_start_tip"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintWidth_percent="0.5">
+        app:layout_constraintWidth_percent="0.33">
         <ImageView
             android:layout_width="@dimen/inquiry_type_png"
             android:layout_height="@dimen/inquiry_type_png"
@@ -114,4 +114,33 @@
             android:textSize="@dimen/main_text_size"
             />
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/request_type_ask"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/start_pulse"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:onClick="startRequest"
+        app:layout_constraintStart_toEndOf="@id/request_type_speak"
+        app:layout_constraintTop_toBottomOf="@id/request_start_tip"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintWidth_percent="0.33">
+        <ImageView
+            android:layout_width="@dimen/inquiry_type_png"
+            android:layout_height="@dimen/inquiry_type_png"
+            android:layout_marginTop="10dp"
+            android:src="@mipmap/request_ask_type"/>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/request_type_ask"
+            android:gravity="center"
+            android:layout_marginTop="10dp"
+            android:padding="10dp"
+            android:textColor="@color/white"
+            android:textSize="@dimen/main_text_size"
+            />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

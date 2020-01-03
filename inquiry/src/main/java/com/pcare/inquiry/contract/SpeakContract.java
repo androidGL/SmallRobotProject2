@@ -4,6 +4,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.pcare.common.base.IView;
 
+import io.reactivex.observers.DisposableSingleObserver;
+import okhttp3.ResponseBody;
+
 
 /**
  * @Author: gl
@@ -12,6 +15,7 @@ import com.pcare.common.base.IView;
  */
 public interface SpeakContract {
     interface Model{
+        void ask(String question, DisposableSingleObserver<ResponseBody> observer);
 
     }
     interface View extends IView {
@@ -23,12 +27,15 @@ public interface SpeakContract {
     interface Presenter{
         void useClickType();//使用UI交互的方式
         void useSpeakType();//使用语音交互
+        void useAskType();//问问题形式
 
 //        void speakListener(MotionEvent event);
         void startSpeak();
         void stopSpeak();
         void setSpeakStr(String s);
         void destoty();//回收内存
+
+        void sendMsg(String msg);
 
     }
 }

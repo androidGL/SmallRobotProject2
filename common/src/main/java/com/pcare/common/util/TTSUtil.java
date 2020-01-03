@@ -66,7 +66,7 @@ public class TTSUtil {
         @Override
         public void onSpeakProgress(int percent, int beginPos, int endPos) {
             // TODO 说话的进度
-            Log.d(TAG, "合成 : " + percent);
+//            Log.d(TAG, "合成 : " + percent);
         }
 
         @Override
@@ -145,9 +145,9 @@ public class TTSUtil {
     /**
      * 停止语音播报
      */
-    public static void stopSpeaking() {
+    public void stopSpeaking() {
         // 对象非空并且正在说话
-        if (null != mTts && mTts.isSpeaking()) {
+        if (isSpeaking()) {
             // 停止说话
             mTts.stopSpeaking();
         }
@@ -157,7 +157,7 @@ public class TTSUtil {
      *
      * @return
      */
-    public  static boolean isSpeaking() {
+    public boolean isSpeaking() {
         if (null != mTts) {
             return mTts.isSpeaking();
         } else {
@@ -201,6 +201,9 @@ public class TTSUtil {
 
     }
 
+    /**
+     * 停止监听人说话
+     */
     public void stopSpeech(){
         if(null != mIat&& !mIat.isListening())
             mIat.stopListening();

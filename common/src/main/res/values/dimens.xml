@@ -17,6 +17,7 @@
     //高度设置
     <dimen name="title_height">40dp</dimen>
     <dimen name="title_height_top">40dp</dimen>
+    <dimen name="title_height_inquiry_bottom">60dp</dimen>
     <dimen name="title_height_second">30dp</dimen>
     <dimen name="title_right_png">40dp</dimen>
 

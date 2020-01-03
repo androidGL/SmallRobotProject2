@@ -32,6 +32,9 @@ public interface Api {
     //问诊的URL
     String URL_VALUE_QUESTION = "URL_VALUE_QUESTION";
     String QUESTIONURL = "http://192.168.2.180:8080";
+    //天益本地问诊的URL
+    String URL_VALUE_ASK = "URL_VALUE_ASK";
+    String ASKURL = "http://192.168.2.219:8088";
 
     //这儿添加Headers是为了修改BaseURL的，key用于识别是不是需要修改BaseURL，value用来识别需要修改哪个BaseURL
     //使用时只需要在网络请求前添加： RetrofitUrlManager.getInstance().putDomain(Api.URL_VALUE_SECOND,"https://new.address.com");
@@ -66,6 +69,13 @@ public interface Api {
     @FormUrlEncoded
     Single<ResponseBody> getAnswer(@Field("question") String question);
 
+    @Headers({URL_KEY+":"+URL_VALUE_ASK})
+    @POST("ask/")
+    @FormUrlEncoded
+    Single<ResponseBody> ask(@Field("query") String question);
+
     @POST("search64")
     Single<NetResponse> getUserList(@Query("image_base64") String imageBase64) ;
+
+
 }

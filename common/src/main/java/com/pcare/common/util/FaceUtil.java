@@ -4,11 +4,13 @@ import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.SurfaceTexture;
+import android.hardware.Camera;
 import android.hardware.camera2.CameraAccessException;
 import android.hardware.camera2.CameraCaptureSession;
 import android.hardware.camera2.CameraCharacteristics;
@@ -26,6 +28,7 @@ import android.util.Log;
 import android.util.Size;
 import android.view.Surface;
 import android.view.TextureView;
+import android.view.ViewGroup;
 
 import androidx.core.app.ActivityCompat;
 
@@ -79,7 +82,10 @@ public class FaceUtil {
     private FaceCompareListener faceCompareListener;
     private String faceUrl, userId;
     private String ugroup = "ASDFG1234";
-    private boolean isOpen = true;
+    private volatile boolean isOpen = true;
+    private final int DELAYTIME = 1000;
+    private int oritentation = 1; // 1表示竖屏，2表示横屏
+    private int mLength;
 
 
     public interface FaceDetectListener {
@@ -94,9 +100,10 @@ public class FaceUtil {
         void compareFail();
     }
 
-    public FaceUtil(Activity lookActivity, TextureView textureView) {
+    public FaceUtil(Activity lookActivity, TextureView textureView,int oritentation) {
         this.lookActivity = lookActivity;
         this.textureView = textureView;
+        this.oritentation = oritentation;
     }
 
     public FaceUtil setFaceDetectListener(FaceDetectListener listener) {
@@ -169,10 +176,10 @@ public class FaceUtil {
             buffer.get(data);
             //ImageFormat.JPEG格式直接转化为Bitmap格式。
             Bitmap temp = BitmapFactory.decodeByteArray(data, 0, data.length);
-            encodeImage(temp);
-            imgBase64 = Base64.encodeToString(data, Base64.NO_WRAP);
+            imgBase64 = encodeImage(temp);
             image.close();
         }
+
 
     };
 
@@ -209,6 +216,7 @@ public class FaceUtil {
             //这里是指实时图像数据的输出目标，以后录制视频、直播等都需要在这里添加对应的Target
             mCaptureRequestBuilder.addTarget(previewSurface);
             mCaptureRequestBuilder.addTarget(imageSurface);
+
             //创建捕获请求，在需要预览、拍照、再次预览的时候都需要通过创建请求来完成
             mCameraDevice.createCaptureSession(Arrays.asList(previewSurface, imageSurface), new CameraCaptureSession.StateCallback() {
                 @Override
@@ -246,15 +254,27 @@ public class FaceUtil {
                 //此处默认打开前置置摄像头
                 if (facing != null && facing != CameraCharacteristics.LENS_FACING_FRONT)
                     continue;
+//                Camera camera = Camera.open(facing);
+//                camera.setDisplayOrientation(90);
                 //获取StreamConfigurationMap，它是管理摄像头支持的所有输出格式和尺寸
                 StreamConfigurationMap map = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 assert map != null;
-                mImageReader = ImageReader.newInstance(width, height,
-                        ImageFormat.JPEG, 1);
-                mImageReader.setOnImageAvailableListener(
-                        mOnImageAvailableListener, mCameraHandler);
+                LogUtil.i("width:"+width + "  height:"+height+ " ORIENTATION"+cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION));
+                mLength = width > height ? height : width;
                 //根据TextureView的尺寸设置预览尺寸
-                mPreviewSize = getOptimalSize(map.getOutputSizes(SurfaceTexture.class), width, height);
+                mPreviewSize = new Size(mLength,mLength);
+                mImageReader = ImageReader.newInstance(mLength, mLength,
+                        ImageFormat.JPEG, 1);
+                ViewGroup.LayoutParams  lp = textureView.getLayoutParams();
+                lp.width = mLength;
+                lp.height = mLength;
+                textureView.setLayoutParams(lp);
+                //如果是横屏，需要逆时针旋转90度
+                if(oritentation == Configuration.ORIENTATION_LANDSCAPE){
+                    textureView.setRotation(-90);
+                }
+                mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mCameraHandler);
+
                 mCameraId = cameraId;
                 break;
             }
@@ -282,44 +302,19 @@ public class FaceUtil {
 
     }
 
-
-    private Size getOptimalSize(Size[] sizeMap, int width, int height) {
-        List<Size> sizeList = new ArrayList<>();
-        for (Size option : sizeMap) {
-            if (width > height) {
-                if (option.getWidth() > width && option.getHeight() > height) {
-                    sizeList.add(option);
-                }
-            } else {
-                if (option.getWidth() > height && option.getHeight() > width) {
-                    sizeList.add(option);
-                }
-            }
-        }
-        if (sizeList.size() > 0) {
-            return Collections.min(sizeList, new Comparator<Size>() {
-                @Override
-                public int compare(Size lhs, Size rhs) {
-                    return Long.signum(lhs.getWidth() * lhs.getHeight() - rhs.getWidth() * rhs.getHeight());
-                }
-            });
-        }
-        return sizeMap[0];
-    }
-
     public void initRequest() {
         timerRunnable = new Runnable() {
             @Override
             public void run() {
                 if (TextUtils.isEmpty(imgBase64)) {
-                    timerHandler.postDelayed(this, 2000);
+                    timerHandler.postDelayed(this, DELAYTIME);
                     return;
                 }
                 post();
-                timerHandler.postDelayed(this, 2000);
+                timerHandler.postDelayed(this, DELAYTIME);
             }
         };
-        timerHandler.postDelayed(timerRunnable, 2000);
+        timerHandler.postDelayed(timerRunnable, 200);
     }
 
     private void post() {
@@ -345,6 +340,7 @@ public class FaceUtil {
                                 if(jsonObject.optInt("status") == 1){
                                     timerHandler.removeCallbacks(timerRunnable);
                                     faceDetectListener.detectSucess();
+                                    isOpen = false;
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();
@@ -375,11 +371,12 @@ public class FaceUtil {
                             JSONObject jsonObject;
                             try {
                                 String result = response.string();
+                                Log.i(TAG,"Response:"+result);
                                 jsonObject = new JSONObject(result);
                                 if(jsonObject.optInt("status") == 1){
                                     timerHandler.removeCallbacks(timerRunnable);
-
                                     faceCompareListener.compareSucess(jsonObject.optJSONArray("data").optJSONObject(0).optString("uid"));
+                                    isOpen = false;
                                 }
                             } catch (IOException e) {
                                 e.printStackTrace();

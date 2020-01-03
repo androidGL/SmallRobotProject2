@@ -28,11 +28,16 @@
 
         <TextureView
             android:id="@+id/look_container"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
-            android:layout_marginTop="1dp" />
+            android:layout_margin="10dp" />
+        <com.pcare.rebot.view.FaceFinderView
+            android:layout_width="500dp"
+            android:layout_height="500dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"/>
     </RelativeLayout>
 
 

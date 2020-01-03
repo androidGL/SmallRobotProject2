@@ -2,6 +2,7 @@ package com.pcare.inquiry.presenter;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -19,10 +20,15 @@ import com.pcare.inquiry.adapter.QuestionSpeakAdapter;
 import com.pcare.inquiry.contract.SpeakContract;
 import com.pcare.inquiry.entity.MsgEntity;
 import com.pcare.inquiry.entity.QuestionEnity;
+import com.pcare.inquiry.model.SpeakModel;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import io.reactivex.observers.DisposableSingleObserver;
+import okhttp3.ResponseBody;
 
 /**
  * @Author: gl
@@ -38,14 +44,20 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
     private RecognizerListener mRecoListener;
     private String speechText;
     private Activity activity;
+    private SpeakContract.Model model;
+    DisposableSingleObserver<ResponseBody> askObserver;
+    private int type = 0;//0表示select，1表示speak，2表示ask
+
     public SpeakPresenter(SpeakContract.View view) {
         super(view);
         activity = (Activity) view;
-        init();
+        model = new SpeakModel();
     }
 
     @Override
     public void useClickType() {
+        type = 0;
+        queationTitleList.addAll(Arrays.asList(activity.getResources().getStringArray(R.array.list_question)));
         List<QuestionEnity> questionList = new ArrayList<QuestionEnity>();
         String[] list_answer =activity .getResources().getStringArray(R.array.list_answer);
         for (int i=0;i<queationTitleList.size();i++){
@@ -60,22 +72,57 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
 
     @Override
     public void useSpeakType() {
-        int num = (int) Math.random()*(queationTitleList.size()-1);
-        setSpeakStr(queationTitleList.get(num));
-        msgEntityList.add(new MsgEntity(queationTitleList.get(num),2));
+        type = 1;
+        queationTitleList.addAll(Arrays.asList(activity.getResources().getStringArray(R.array.list_question)));
+        initRecoListener();
+        setSpeakStr(queationTitleList.get(0));
+        msgEntityList.add(new MsgEntity(queationTitleList.get(0),2));
+        queationTitleList.remove(0);
         selectAdapter = new QuestionSpeakAdapter(activity,msgEntityList);
         getView().setAdapter(selectAdapter);
     }
 
     @Override
+    public void useAskType() {
+        type = 2;
+        initRecoListener();
+        setSpeakStr("请问有什么需要帮助您的？");
+        msgEntityList.add(new MsgEntity("请问有什么需要帮助您的？",2));
+        selectAdapter = new QuestionSpeakAdapter(activity,msgEntityList);
+        getView().setAdapter(selectAdapter);
+    }
+
+    /**
+     * 开始监听人说话
+     */
+    @Override
     public void startSpeak() {
+        stopSpeaking();
         speechText = "";
         TTSUtil.getInstance(activity.getApplicationContext()).startSpeech(mRecoListener);
     }
 
+    /**
+     * 停止监听人说话
+     */
     @Override
     public void stopSpeak() {
         TTSUtil.getInstance(activity.getApplicationContext()).stopSpeech();
+    }
+
+    /**
+     * 开始语音播报
+     * @param msg
+     */
+    private void startSpeaking(String msg){
+        TTSUtil.getInstance(activity.getApplicationContext()).speaking(msg);
+    }
+
+    /**
+     * 停止语音播报
+     */
+    private void stopSpeaking(){
+        TTSUtil.getInstance(activity.getApplicationContext()).stopSpeaking();
     }
 
 
@@ -86,12 +133,57 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
 
     @Override
     public void destoty() {
-//        if(null != speechToTextUtil) speechToTextUtil.destotySpeechToSpeak();
-//        TextToSpeechUtil.destoty();
+        stopSpeaking();
     }
 
-    private  void init(){
-        queationTitleList.addAll(Arrays.asList(activity.getResources().getStringArray(R.array.list_question)));
+    @Override
+    public void sendMsg(String msg) {
+        stopSpeaking();
+        speechText = msg;
+        msgEntityList.add(new MsgEntity(speechText, 1));
+        selectAdapter.notifyDataSetChanged();
+        addMsg();
+    }
+
+    private void addMsg(){
+        //问诊模式
+        if(type == 1) {
+            if (null != queationTitleList && queationTitleList.size() > 0) {
+                msgEntityList.add(new MsgEntity(queationTitleList.get(0), 2));
+                selectAdapter.notifyDataSetChanged();
+                startSpeaking(queationTitleList.get(0));
+                queationTitleList.remove(0);
+            }
+        }else if(type == 2) {
+            //问问题的模式
+            askObserver = new DisposableSingleObserver<ResponseBody>() {
+                @Override
+                public void onSuccess(ResponseBody value) {
+                    try {
+                        String result = value.string();
+                        result = result.substring(1,result.length()-1);
+                        if(TextUtils.isEmpty(result)){
+                            result = "对不起，我不明白您的问题。";
+                        }
+                        msgEntityList.add(new MsgEntity(result, 2));
+                        selectAdapter.notifyDataSetChanged();
+                        startSpeaking(result);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+
+                @Override
+                public void onError(Throwable e) {
+                    e.printStackTrace();
+                }
+            };
+            addDisposable(askObserver);
+            model.ask(speechText,askObserver);
+        }
+    }
+
+    private  void initRecoListener(){
         // 听写监听器
         mRecoListener = new RecognizerListener() {
             //isLast等于true 时会话结束。
@@ -103,12 +195,7 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
                     showTip("结果2" + speechText);
                     msgEntityList.add(new MsgEntity(speechText, 1));
                     selectAdapter.notifyDataSetChanged();
-                    if(null != queationTitleList && queationTitleList.size()>0) {
-                        msgEntityList.add(new MsgEntity(queationTitleList.get(0), 2));
-                        selectAdapter.notifyDataSetChanged();
-                        TTSUtil.getInstance(activity.getApplicationContext()).speaking(queationTitleList.get(0));
-                        queationTitleList.remove(0);
-                    }
+                    addMsg();
                 }
             }
 
@@ -137,6 +224,7 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
             public void onEvent(int eventType, int arg1 , int arg2, Bundle obj) {
             }
         };
+
     }
     private void showTip(String info){
         Log.i(TAG,info);
