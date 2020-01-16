@@ -39,7 +39,7 @@ public class GlucoseEntity {
 	private String glucoseConcentration;//血糖值，默认0
 	private int sampleType;//测量类型，默认0
 	private int sampleLocation;//测量位置，默认0
-	private int status;//状态码，默认0
+	private int status = 1;//状态码，默认0
 
 	public GlucoseEntity(String userId, int sequenceNumber, Date timeDate, String glucoseConcentration, int sampleType, int sampleLocation, int status) {
 		this.userId = userId;
@@ -82,18 +82,20 @@ public class GlucoseEntity {
 
 	@Override
 	public String toString() {
-		return "GlucoseEntity{" +
-				"userId='" + userId + '\'' +
-				", sequenceNumber=" + sequenceNumber +
-				", timeDate=" + timeDate +
-				", glucoseConcentration=" + glucoseConcentration +
-				", sampleType=" + sampleType +
-				", sampleLocation=" + sampleLocation +
-				", status=" + status +
-				'}';
+		return "{\"userId\":\"" + getUserId() +
+				"\",\"gluId\":\"" + getGluId() +
+				"\",\"sequenceNumber\":\"" + getSequenceNumber() +
+				"\",\"timeDate\":\"" + getTimeDate() +
+				"\",\"glucoseConcentration\":\"" + getGlucoseConcentration() +
+				"\",\"sampleType\":\"" + getSampleType() +
+				"\",\"sampleLocation\":\"" + getSampleLocation() +
+				"\",\"status\":\"" + getStatus() +
+				"\"}";
 	}
 
 	public Long getGluId() {
+		if(null == this.gluId)
+			this.gluId = 0L;
 		return this.gluId;
 	}
 

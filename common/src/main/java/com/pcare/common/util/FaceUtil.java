@@ -20,6 +20,7 @@ import android.hardware.camera2.CaptureRequest;
 import android.hardware.camera2.params.StreamConfigurationMap;
 import android.media.Image;
 import android.media.ImageReader;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.text.TextUtils;
@@ -86,6 +87,7 @@ public class FaceUtil {
     private final int DELAYTIME = 1000;
     private int oritentation = 1; // 1表示竖屏，2表示横屏
     private int mLength;
+    private CountDownTimer mCountDownTimer;
 
 
     public interface FaceDetectListener {
@@ -94,13 +96,41 @@ public class FaceUtil {
         void detectFail();
     }
 
+    //设置超时时间，需在开始识别前设置
+    public FaceUtil setTimeOut(int millis) {
+        if (millis > 0) {
+            mCountDownTimer = new CountDownTimer(millis, 1000) {
+
+                @Override
+                public void onTick(long millisUntilFinished) {
+
+                }
+
+                @Override
+                public void onFinish() {
+                    if (isOpen) {
+                        isOpen = false;
+                        if (!TextUtils.isEmpty(userId)) {
+                            faceDetectListener.detectFail();
+                        } else {
+                            faceCompareListener.compareFail();
+                        }
+                    }
+                    mCountDownTimer = null;
+                }
+            };
+            mCountDownTimer.start();
+        }
+        return this;
+    }
+
     public interface FaceCompareListener {
         void compareSucess(String userId);
 
         void compareFail();
     }
 
-    public FaceUtil(Activity lookActivity, TextureView textureView,int oritentation) {
+    public FaceUtil(Activity lookActivity, TextureView textureView, int oritentation) {
         this.lookActivity = lookActivity;
         this.textureView = textureView;
         this.oritentation = oritentation;
@@ -178,6 +208,9 @@ public class FaceUtil {
             Bitmap temp = BitmapFactory.decodeByteArray(data, 0, data.length);
             imgBase64 = encodeImage(temp);
             image.close();
+            temp.recycle();
+            temp = null;
+            data = null;
         }
 
 
@@ -254,23 +287,22 @@ public class FaceUtil {
                 //此处默认打开前置置摄像头
                 if (facing != null && facing != CameraCharacteristics.LENS_FACING_FRONT)
                     continue;
-//                Camera camera = Camera.open(facing);
-//                camera.setDisplayOrientation(90);
+
                 //获取StreamConfigurationMap，它是管理摄像头支持的所有输出格式和尺寸
                 StreamConfigurationMap map = cameraCharacteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
                 assert map != null;
-                LogUtil.i("width:"+width + "  height:"+height+ " ORIENTATION"+cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION));
+                LogUtil.i("width:" + width + "  height:" + height + " ORIENTATION" + cameraCharacteristics.get(CameraCharacteristics.SENSOR_ORIENTATION));
                 mLength = width > height ? height : width;
                 //根据TextureView的尺寸设置预览尺寸
-                mPreviewSize = new Size(mLength,mLength);
+                mPreviewSize = new Size(mLength, mLength);
                 mImageReader = ImageReader.newInstance(mLength, mLength,
                         ImageFormat.JPEG, 1);
-                ViewGroup.LayoutParams  lp = textureView.getLayoutParams();
+                ViewGroup.LayoutParams lp = textureView.getLayoutParams();
                 lp.width = mLength;
                 lp.height = mLength;
                 textureView.setLayoutParams(lp);
                 //如果是横屏，需要逆时针旋转90度
-                if(oritentation == Configuration.ORIENTATION_LANDSCAPE){
+                if (oritentation == Configuration.ORIENTATION_LANDSCAPE) {
                     textureView.setRotation(-90);
                 }
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mCameraHandler);
@@ -291,15 +323,16 @@ public class FaceUtil {
         String encImage = Base64.encodeToString(b, Base64.DEFAULT);
         return encImage;
     }
+
     private Bitmap rotateBitmap(Bitmap bitmap) {
-        if (bitmap != null) {
+        //如果是竖屏，需要旋转270度
+        if (bitmap != null && oritentation == Configuration.ORIENTATION_PORTRAIT) {
             Matrix m = new Matrix();
             m.postRotate(270);
-            bitmap = Bitmap.createBitmap(bitmap,0,0,bitmap.getWidth(),bitmap.getHeight(),m,true);
+            bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), m, true);
             return bitmap;
         }
         return bitmap;
-
     }
 
     public void initRequest() {
@@ -323,29 +356,20 @@ public class FaceUtil {
             RetrofitHelper.getInstance()
                     .getRetrofit()
                     .create(Api.class)
-                    .detectFace(userId, imgBase64,ugroup)
+                    .detectFace(userId, imgBase64, ugroup)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.newThread())
-                    .subscribeWith(new DisposableSingleObserver<ResponseBody>() {
+                    .subscribeWith(new DisposableSingleObserver<NetResponse>() {
 
                         @Override
-                        public void onSuccess(ResponseBody response) {
-                            if(!isOpen)
+                        public void onSuccess(NetResponse response) {
+                            if (!isOpen)
                                 return;
-                            JSONObject jsonObject;
-                            try {
-                                String result = response.string();
-                                Log.i(TAG,"Response:"+result);
-                                jsonObject = new JSONObject(result);
-                                if(jsonObject.optInt("status") == 1){
-                                    timerHandler.removeCallbacks(timerRunnable);
-                                    faceDetectListener.detectSucess();
-                                    isOpen = false;
-                                }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }catch (JSONException e) {
-                                e.printStackTrace();
+                            Log.i(TAG, "Response:" + response.toString());
+                            if (response.getStatus() == 1) {
+                                timerHandler.removeCallbacks(timerRunnable);
+                                faceDetectListener.detectSucess();
+                                isOpen = false;
                             }
                         }
 
@@ -359,28 +383,26 @@ public class FaceUtil {
             RetrofitHelper.getInstance()
                     .getRetrofit()
                     .create(Api.class)
-                    .compareFace(imgBase64,ugroup)
+                    .compareFace(imgBase64, ugroup)
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.newThread())
-                    .subscribeWith(new DisposableSingleObserver<ResponseBody>() {
+                    .subscribeWith(new DisposableSingleObserver<NetResponse>() {
 
                         @Override
-                        public void onSuccess(ResponseBody response) {
-                            if(!isOpen)
+                        public void onSuccess(NetResponse response) {
+                            if (!isOpen)
                                 return;
                             JSONObject jsonObject;
                             try {
-                                String result = response.string();
-                                Log.i(TAG,"Response:"+result);
-                                jsonObject = new JSONObject(result);
-                                if(jsonObject.optInt("status") == 1){
+                                String result = response.toString();
+                                Log.i(TAG, "Response:" + result);
+                                if (response.getStatus() == 1) {
+                                    jsonObject = new JSONObject(response.getData().toString());
                                     timerHandler.removeCallbacks(timerRunnable);
-                                    faceCompareListener.compareSucess(jsonObject.optJSONArray("data").optJSONObject(0).optString("uid"));
+                                    faceCompareListener.compareSucess(jsonObject.optString("userId"));
                                     isOpen = false;
                                 }
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }catch (JSONException e) {
+                            } catch (JSONException e) {
                                 e.printStackTrace();
                             }
                         }
@@ -411,6 +433,10 @@ public class FaceUtil {
             timerHandler.removeCallbacks(timerRunnable);
             timerHandler = null;
             timerRunnable = null;
+        }
+        if (null != mCountDownTimer) {
+            mCountDownTimer.cancel();
+            mCountDownTimer = null;
         }
     }
 

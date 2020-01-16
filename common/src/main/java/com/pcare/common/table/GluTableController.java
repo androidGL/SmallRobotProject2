@@ -97,13 +97,8 @@ public class GluTableController {
      * @param glucoseEntity
      */
     public boolean insertOrReplace(GlucoseEntity glucoseEntity){
-        if(!isExistSameItem(glucoseEntity)) {
-            Log.i("Table-----","true");
-            glucoseEntityDao.insertOrReplace(glucoseEntity);
-            return true;
-        }
-        Log.i("Table-----","false");
-        return true;
+        glucoseEntityDao.insertOrReplace(glucoseEntity);
+        return false;
     }
     /**插入一条记录，表里面要没有与之相同的记录
      *

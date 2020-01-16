@@ -23,7 +23,7 @@ public class RegisterModel implements RegisterContract.Model {
         RetrofitHelper.getInstance()
                 .getRetrofit()
                 .create(Api.class)
-                .register(userInfo)
+                .register(userInfo,"register")
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.newThread())
                 .subscribeWith(observer);
@@ -34,7 +34,7 @@ public class RegisterModel implements RegisterContract.Model {
         RetrofitHelper.getInstance()
                 .getRetrofit()
                 .create(Api.class)
-                .register(userInfo)
+                .register(userInfo,"register")
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.newThread())
                 .subscribeWith(observer);

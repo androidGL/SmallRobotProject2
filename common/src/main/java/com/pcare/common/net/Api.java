@@ -1,8 +1,13 @@
 package com.pcare.common.net;
 
 
+import com.pcare.common.entity.BPMEntity;
+import com.pcare.common.entity.GlucoseEntity;
 import com.pcare.common.entity.NetResponse;
 import com.pcare.common.entity.UserEntity;
+
+import org.json.JSONObject;
+
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import okhttp3.ResponseBody;
@@ -18,7 +23,8 @@ public interface Api {
 
     //成员变量,默认修饰符 public static final
     //成员方法,默认修饰符 public abstract
-    String BASEURL = "https://api.apiopen.top";//测试api
+//    String BASEURL = "http://192.168.13.169:8080";//武祥成本地
+    String BASEURL = "http://192.168.2.180:8080";//服务器
 
     //header中添加 URL_KEY，表示这个请求是需要替换BaseUrl的
     String URL_KEY = "URL_KEY";
@@ -35,6 +41,9 @@ public interface Api {
     //天益本地问诊的URL
     String URL_VALUE_ASK = "URL_VALUE_ASK";
     String ASKURL = "http://192.168.2.219:8088";
+    //沈新哲本地的语音合成
+    String URL_VALUE_AUDIO  = "URL_VALUE_AUDIO";
+    String AUDIOURL = "http://192.168.2.191:6666";
 
     //这儿添加Headers是为了修改BaseURL的，key用于识别是不是需要修改BaseURL，value用来识别需要修改哪个BaseURL
     //使用时只需要在网络请求前添加： RetrofitUrlManager.getInstance().putDomain(Api.URL_VALUE_SECOND,"https://new.address.com");
@@ -47,21 +56,27 @@ public interface Api {
 
     //注册用户
 //    @Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
-    @POST("register")
+    @POST("reg/")
     @FormUrlEncoded
-    Single<NetResponse<UserEntity>> register(@Field("entity") UserEntity userEntity);
+    Single<NetResponse<UserEntity>> register(@Field("item") UserEntity userEntity,@Field("operate") String operate);
+//    //注册用户
+////    @Headers("Content-Type:application/x-www-form-urlencoded; charset=utf-8")
+//    @POST("register")
+//    @FormUrlEncoded
+//    Single<NetResponse<UserEntity>> register(@Field("entity") UserEntity userEntity);
+
 
     //人脸注册
     @Headers({URL_KEY+":"+URL_VALUE_FACE})
     @POST("detect64")
     @FormUrlEncoded
-    Single<ResponseBody> detectFace(@Field("usr_id") String userId,@Field("image_base64") String imageBase64,@Field("ugroup") String ugroup);
+    Single<NetResponse> detectFace(@Field("usr_id") String userId,@Field("image_base64") String imageBase64,@Field("ugroup") String ugroup);
 
     //人脸识别
     @Headers({URL_KEY+":"+URL_VALUE_FACE})
     @POST("search64")
     @FormUrlEncoded
-    Single<ResponseBody> compareFace(@Field("image_base64") String imageBase64,@Field("ugroup") String ugroup);
+    Single<NetResponse> compareFace(@Field("image_base64") String imageBase64,@Field("ugroup") String ugroup);
 
     //问诊问题
     @Headers({URL_KEY+":"+URL_VALUE_QUESTION})
@@ -77,5 +92,28 @@ public interface Api {
     @POST("search64")
     Single<NetResponse> getUserList(@Query("image_base64") String imageBase64) ;
 
+    //保存血压
+    @POST("bpress/")
+    @FormUrlEncoded
+    Single<NetResponse> insertBPM(@Field("operate") String operate,@Field("item") BPMEntity entity);
+
+    //查询血压
+    @POST("bpress/")
+    @FormUrlEncoded
+    Single<NetResponse> getBPMList(@Field("operate") String operate,@Field("item") JSONObject object);
+
+    //保存血糖
+    @POST("glu/")
+    @FormUrlEncoded
+    Single<NetResponse> insertGLU(@Field("operate") String operate,@Field("item") GlucoseEntity entity);
+
+    //查询血压
+    @POST("glu/")
+    @FormUrlEncoded
+    Single<NetResponse> getGLUList(@Field("operate") String operate,@Field("item") JSONObject object);
+
+    @Headers({URL_KEY+":"+URL_VALUE_AUDIO})
+    @GET("tts")
+    Observable<ResponseBody> playAudio(@Query("text") String text);
 
 }

@@ -87,17 +87,21 @@ public class BPMEntity {
         this.bpmId = bpmId;
     }
 
+    private String getStatus(){
+        return "1";
+    }
+
     @Override
     public String toString() {
-        return "BPMEntity{" +
-                "userId='" + userId + '\'' +
-                ", bpmId='" + bpmId + '\'' +
-                ", systolicData='" + systolicData + '\'' +
-                ", diastolicData='" + diastolicData + '\'' +
-                ", meanAPData='" + meanAPData + '\'' +
-                ", unit='" + unit + '\'' +
-                ", pulseData='" + pulseData + '\'' +
-                ", timeData=" + timeData +
-                '}';
+        return "{\"userId\":\"" + getUserId() +
+                "\",\"bpmId\":\"" + getBpmId() +
+                "\",\"systolicdata\":\"" + getSystolicData() +
+                "\",\"diastolicdata\":\"" + getDiastolicData() +
+                "\",\"meanAPData\":\"" + getMeanAPData() +
+                "\",\"unit\":\"" + getUnit() +
+                "\",\"pulseData\":\"" + getPulseData() +
+                "\",\"timeData\":\"" + getTimeData() +
+                "\",\"status\":\"" + getStatus() +
+                "\"}";
     }
 }

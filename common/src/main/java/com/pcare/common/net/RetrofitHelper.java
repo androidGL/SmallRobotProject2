@@ -85,6 +85,7 @@ public class RetrofitHelper {
         @Override
         public void log(String message) {
             try {
+                message = message.replaceAll("%(?![0-9a-fA-F]{2})", "%25");
                 showLog("retrofitLogging: "+URLDecoder.decode(message, "UTF-8"));
             } catch (UnsupportedEncodingException e) {
                 e.printStackTrace();

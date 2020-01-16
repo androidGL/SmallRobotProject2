@@ -12,15 +12,26 @@ import com.pcare.common.base.BaseActivity;
 import com.pcare.common.base.IPresenter;
 import com.pcare.common.entity.BPMEntity;
 import com.pcare.common.entity.GlucoseEntity;
+import com.pcare.common.entity.NetResponse;
 import com.pcare.common.entity.UserEntity;
+import com.pcare.common.net.Api;
+import com.pcare.common.net.RetrofitHelper;
+import com.pcare.common.net.url.RetrofitUrlManager;
 import com.pcare.common.table.BPMTableController;
 import com.pcare.common.table.GluTableController;
 import com.pcare.common.table.UserDao;
 import com.pcare.common.table.UserTableController;
+import com.pcare.common.util.AudioTrackUtil;
 import com.pcare.common.util.CommonUtil;
+import com.pcare.common.util.LogUtil;
 import com.pcare.common.view.CurveTrendChartView;
 import com.pcare.rebot.R;
+import com.pcare.rebot.contract.UserListContract;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
@@ -42,6 +53,12 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.WeakHashMap;
+
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
+import okhttp3.ResponseBody;
 
 /**
  * @Author: gl
@@ -85,7 +102,8 @@ public class TestActivity extends BaseActivity {
         super.start();
 //        testCurve();
         getUser();
-
+        testGetBPMList();
+        testGetGluList();
     }
 
     private void testCurve() {
@@ -148,66 +166,66 @@ public class TestActivity extends BaseActivity {
         WeakHashMap weakHashMap;
     }
 
-    public void addGLU(View v){
-        if(TextUtils.isEmpty(editText.getText().toString())) {
+    public void addGLU(View v) {
+        if (TextUtils.isEmpty(editText.getText().toString())) {
             Toast.makeText(this, "输入用户ID", Toast.LENGTH_SHORT);
             return;
         }
         GluTableController.getInstance(getSelfActivity()).clear();
         GlucoseEntity entity = new GlucoseEntity();
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2019, 7, 16,5,00);
+        calendar.set(2019, 7, 16, 5, 00);
         entity.setTimeDate(calendar.getTime());
         entity.setSequenceNumber(0);
         entity.setGlucoseConcentration("0.0049");
         entity.setSampleType(0);
         entity.setSampleLocation(0);
-        entity.setStatus( 0);
+        entity.setStatus(0);
         entity.setUserId(editText.getText().toString());
         GluTableController.getInstance(getSelfActivity()).insert(entity);
 
         entity = new GlucoseEntity();
-        calendar.set(2019, 7, 16,6,30);
+        calendar.set(2019, 7, 16, 6, 30);
         entity.setTimeDate(calendar.getTime());
         entity.setSequenceNumber(0);
         entity.setGlucoseConcentration("0.0050");
         entity.setSampleType(0);
         entity.setSampleLocation(0);
-        entity.setStatus( 0);
+        entity.setStatus(0);
         entity.setUserId(editText.getText().toString());
         GluTableController.getInstance(getSelfActivity()).insert(entity);
 
         entity = new GlucoseEntity();
-        calendar.set(2019, 7, 16,7,40);
+        calendar.set(2019, 7, 16, 7, 40);
         entity.setTimeDate(calendar.getTime());
         entity.setSequenceNumber(0);
         entity.setGlucoseConcentration("0.0069");
         entity.setSampleType(0);
         entity.setSampleLocation(0);
-        entity.setStatus( 0);
+        entity.setStatus(0);
         entity.setUserId(editText.getText().toString());
         GluTableController.getInstance(getSelfActivity()).insert(entity);
 
         entity = new GlucoseEntity();
-        calendar.set(2019, 7, 16,10,20);
+        calendar.set(2019, 7, 16, 10, 20);
         entity.setTimeDate(calendar.getTime());
         entity.setSequenceNumber(0);
         entity.setGlucoseConcentration("0.0049");
         entity.setSampleType(0);
         entity.setSampleLocation(0);
-        entity.setStatus( 0);
+        entity.setStatus(0);
         entity.setUserId(editText.getText().toString());
         GluTableController.getInstance(getSelfActivity()).insert(entity);
 
         entity = new GlucoseEntity();
-        calendar.set(2019, 7, 16,11,33);
+        calendar.set(2019, 7, 16, 11, 33);
         entity.setTimeDate(calendar.getTime());
         entity.setGlucoseConcentration("0.0099");
         entity.setUserId(editText.getText().toString());
         GluTableController.getInstance(getSelfActivity()).insert(entity);
 
         entity = new GlucoseEntity();
-        calendar.set(2019, 7, 16,19,30);
+        calendar.set(2019, 7, 16, 19, 30);
         entity.setTimeDate(calendar.getTime());
         entity.setGlucoseConcentration("0.0039");
         entity.setUserId(editText.getText().toString());
@@ -215,14 +233,14 @@ public class TestActivity extends BaseActivity {
     }
 
     public void addBPM(View v) {
-        if(TextUtils.isEmpty(editText.getText().toString())) {
+        if (TextUtils.isEmpty(editText.getText().toString())) {
             Toast.makeText(this, "输入用户ID", Toast.LENGTH_SHORT);
             return;
         }
         BPMTableController.getInstance(getApplicationContext()).clear();
         BPMEntity bpmEntity = new BPMEntity();
         Calendar calendar = Calendar.getInstance();
-        calendar.set(2019, 7, 16,7,30);
+        calendar.set(2019, 7, 16, 7, 30);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -232,7 +250,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 17,20,20);
+        calendar.set(2019, 7, 17, 20, 20);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -242,7 +260,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 18,7,20);
+        calendar.set(2019, 7, 18, 7, 20);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -252,7 +270,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 19,9,50);
+        calendar.set(2019, 7, 19, 9, 50);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -262,7 +280,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 21,0,0);
+        calendar.set(2019, 7, 21, 0, 0);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -272,7 +290,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 23,12,0);
+        calendar.set(2019, 7, 23, 12, 0);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -282,7 +300,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 27,23,0);
+        calendar.set(2019, 7, 27, 23, 0);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -292,7 +310,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 28,8,9);
+        calendar.set(2019, 7, 28, 8, 9);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -302,7 +320,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 31,0,0);
+        calendar.set(2019, 7, 31, 0, 0);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -312,7 +330,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 31,7,30);
+        calendar.set(2019, 7, 31, 7, 30);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -322,7 +340,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 31,8,10);
+        calendar.set(2019, 7, 31, 8, 10);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -332,7 +350,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 31,8,30);
+        calendar.set(2019, 7, 31, 8, 30);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -342,7 +360,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 31,8,31);
+        calendar.set(2019, 7, 31, 8, 31);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -352,7 +370,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 31,11,30);
+        calendar.set(2019, 7, 31, 11, 30);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -362,7 +380,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 31,16,30);
+        calendar.set(2019, 7, 31, 16, 30);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -372,7 +390,7 @@ public class TestActivity extends BaseActivity {
         bpmEntity.setPulseData("70.0");
         bpmEntity.setUnit(getString(R.string.bpm_unit_mmhg));
         BPMTableController.getInstance(getSelfActivity()).insert(bpmEntity);
-        calendar.set(2019, 7, 31,17,30);
+        calendar.set(2019, 7, 31, 17, 30);
         bpmEntity.setTimeData(calendar.getTime());
         bpmEntity.setBpmId(editText.getText().toString() + "-" + calendar.getTime());
         bpmEntity.setUserId(editText.getText().toString());
@@ -408,5 +426,99 @@ public class TestActivity extends BaseActivity {
                 Log.i("getGlucoseEntity", entity.toString());
             }
         }
+    }
+
+    private void testGetBPMList() {
+        JSONObject object = new JSONObject();
+        try {
+            object.putOpt("userId", UserDao.getCurrentUserId());
+            RetrofitHelper.getInstance()
+                    .getRetrofit()
+                    .create(Api.class)
+                    .getBPMList("query", object)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.newThread())
+                    .subscribeWith(new DisposableSingleObserver<NetResponse>() {
+                        @Override
+                        public void onSuccess(NetResponse value) {
+                            LogUtil.i(value.toString());
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+                    });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void testGetGluList() {
+        JSONObject object = new JSONObject();
+        try {
+            object.putOpt("userId", UserDao.getCurrentUserId());
+            RetrofitHelper.getInstance()
+                    .getRetrofit()
+                    .create(Api.class)
+                    .getGLUList("query", object)
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.newThread())
+                    .subscribeWith(new DisposableSingleObserver<NetResponse>() {
+                        @Override
+                        public void onSuccess(NetResponse value) {
+                            LogUtil.i(value.toString());
+                        }
+
+                        @Override
+                        public void onError(Throwable e) {
+
+                        }
+                    });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    public void testAudioTrack(View view){
+        String text = editText.getText().toString();
+        RetrofitUrlManager.getInstance().putDomain(Api.URL_VALUE_AUDIO,Api.AUDIOURL);
+        RetrofitHelper.getInstance()
+                .getRetrofit()
+                .create(Api.class)
+                .playAudio(text)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribeWith(new DisposableObserver<ResponseBody>() {
+                    @Override
+                    public void onNext(ResponseBody value) {
+                        JSONObject jsonObject;
+                        try {
+                            String s = value.string();
+                            LogUtil.i(s);
+                            AudioTrackUtil util = new AudioTrackUtil();
+                            jsonObject = new JSONObject(s);
+                            LogUtil.i(jsonObject.optString("data"));
+                            util.startPlay(jsonObject.optString("data"));
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }catch (JSONException e){
+                            e.printStackTrace();
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
+
     }
 }

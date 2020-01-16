@@ -31,12 +31,13 @@ public class FaceActivity extends BaseActivity {
     public void start() {
         super.start();
         textureView = findViewById(R.id.look_container);
-        faceUtil = new FaceUtil(this, textureView,this.getResources().getConfiguration().orientation)
+        faceUtil = new FaceUtil(this, textureView, this.getResources().getConfiguration().orientation)
+                .setTimeOut(10000)
                 .setFaceDetectListener(new FaceUtil.FaceDetectListener() {
                     @Override
                     public void detectSucess() {
                         if (getIntent().hasExtra("resource") && "register".equals(getIntent().getStringExtra("resource"))) {
-                            Toast.makeText(getApplicationContext(), "添加新用户成功", Toast.LENGTH_SHORT);
+                            Toast.makeText(getApplicationContext(), "添加新用户成功", Toast.LENGTH_SHORT).show();
                             startActivity(new Intent(FaceActivity.this, MainActivity.class));
                         }
                         finish();
@@ -44,15 +45,16 @@ public class FaceActivity extends BaseActivity {
 
                     @Override
                     public void detectFail() {
-
+                        Toast.makeText(getApplicationContext(), "人脸注册失败", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 })
                 .setFaceCompareListener(new FaceUtil.FaceCompareListener() {
                     @Override
                     public void compareSucess(String userId) {
                         if (getIntent().hasExtra("resource") && "login".equals(getIntent().getStringExtra("resource"))) {
-                            if(UserDao.get(getSelfActivity()).setCurrentUser(userId)){
-                                Toast.makeText(getApplicationContext(), "登陆成功", Toast.LENGTH_SHORT);
+                            if (UserDao.get(getSelfActivity()).setCurrentUser(userId)) {
+                                Toast.makeText(getApplicationContext(), "登陆成功", Toast.LENGTH_SHORT).show();
                                 startActivity(new Intent(FaceActivity.this, MainActivity.class));
                             }
 
@@ -63,13 +65,13 @@ public class FaceActivity extends BaseActivity {
 
                     @Override
                     public void compareFail() {
-
+                        Toast.makeText(getApplicationContext(), "人脸登陆失败", Toast.LENGTH_SHORT).show();
+                        finish();
                     }
                 });
         type = getIntent().getIntExtra("type", 0);
         if (type == 0) {
             faceUtil.init(Api.FACEURL, getIntent().getStringExtra("userId"));
-//            faceUtil.init(Api.FACEURL, UserDao.getCurrentUserId());
         } else {
             faceUtil.init(Api.FACEURL, null);
         }

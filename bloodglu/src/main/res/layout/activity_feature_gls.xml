@@ -143,4 +143,55 @@
         android:layout_margin="@dimen/activity_vertical_margin_bottom"
         android:onClick="onConnectClicked"
         android:text="@string/action_connect" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_margin="20dp"
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal">
+        <EditText
+            android:id="@+id/t_month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="月"
+            android:inputType="number"
+            android:padding="5dp"/>
+        <EditText
+            android:id="@+id/t_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="日"
+            android:inputType="number"
+            android:padding="5dp"/>
+        <EditText
+            android:id="@+id/t_hour"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="小时"
+            android:padding="5dp"/>
+        <EditText
+            android:id="@+id/t_min"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="分钟"
+            android:inputType="number"
+            android:padding="5dp"/>
+        <EditText
+            android:id="@+id/t_value"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:hint="血糖如：0.0049"
+            android:inputType="numberDecimal"
+            android:padding="5dp"/>
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:onClick="testNet"
+            android:text="接口测试" />
+    </LinearLayout>
+
 </LinearLayout>

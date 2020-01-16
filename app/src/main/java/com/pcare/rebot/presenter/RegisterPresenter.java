@@ -1,6 +1,7 @@
 package com.pcare.rebot.presenter;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.pcare.common.base.BasePresenter;
 import com.pcare.common.entity.NetResponse;
@@ -37,7 +38,7 @@ public class RegisterPresenter extends BasePresenter<RegisterContract.View> impl
                 if(value.getStatus() == 1) {
                     getView().saveUser(value.getData());
                 }else {
-
+                    Toast.makeText(getView().getSelfActivity(),value.getMsg(),Toast.LENGTH_SHORT).show();
                 }
 
             }

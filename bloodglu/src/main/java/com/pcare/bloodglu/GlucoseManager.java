@@ -13,14 +13,21 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.pcare.common.entity.GlucoseEntity;
+import com.pcare.common.entity.NetResponse;
+import com.pcare.common.net.Api;
+import com.pcare.common.net.RetrofitHelper;
 import com.pcare.common.oem.battery.BatteryManager;
 import com.pcare.common.oem.battery.BatteryManagerCallbacks;
+import com.pcare.common.table.BPMTableController;
 import com.pcare.common.table.GluTableController;
 import com.pcare.common.table.UserDao;
 
 import java.util.Calendar;
 import java.util.UUID;
 
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableSingleObserver;
+import io.reactivex.schedulers.Schedulers;
 import no.nordicsemi.android.ble.common.callback.glucose.GlucoseMeasurementDataCallback;
 import no.nordicsemi.android.ble.common.data.RecordAccessControlPointData;
 import no.nordicsemi.android.ble.data.Data;
@@ -106,7 +113,9 @@ public class GlucoseManager extends BatteryManager<BatteryManagerCallbacks> {
 							record.setSampleLocation(sampleLocation != null ? sampleLocation : 0);
 							record.setStatus( status != null ? status.value : 0);
 							record.setUserId(UserDao.getCurrentUserId());
-							if(GluTableController.getInstance(mContext).insertOrReplace(record)){
+							//如果存在新的记录，则回调
+							if(!GluTableController.getInstance(mContext).isExistSameItem(record)) {
+								Log.i("Table-----","true");
 								refreshCallBack.getNewRecord(record);
 							}
 							Log.i("TableReceived-----",record.toString());
@@ -167,4 +176,6 @@ public class GlucoseManager extends BatteryManager<BatteryManagerCallbacks> {
 		writeCharacteristic(mRecordAccessControlPointCharacteristic, RecordAccessControlPointData.deleteAllStoredRecords()).enqueue();
 
 	}
+
+
 }
