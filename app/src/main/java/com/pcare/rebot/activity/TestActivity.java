@@ -25,6 +25,8 @@ import com.pcare.common.util.AudioTrackUtil;
 import com.pcare.common.util.CommonUtil;
 import com.pcare.common.util.LogUtil;
 import com.pcare.common.view.CurveTrendChartView;
+import com.pcare.common.websocket.WsManager;
+import com.pcare.common.websocket.WsStatusListener;
 import com.pcare.rebot.R;
 import com.pcare.rebot.contract.UserListContract;
 
@@ -53,12 +55,16 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.Vector;
 import java.util.WeakHashMap;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.observers.DisposableSingleObserver;
 import io.reactivex.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
+import okhttp3.Response;
 import okhttp3.ResponseBody;
+import okio.ByteString;
 
 /**
  * @Author: gl
@@ -68,6 +74,7 @@ import okhttp3.ResponseBody;
 public class TestActivity extends BaseActivity {
     private EditText editText;
     private String id;
+
 
     @Override
     public int getLayoutId() {
@@ -101,9 +108,9 @@ public class TestActivity extends BaseActivity {
     public void start() {
         super.start();
 //        testCurve();
-        getUser();
-        testGetBPMList();
-        testGetGluList();
+//        getUser();
+//        testGetBPMList();
+//        testGetGluList();
     }
 
     private void testCurve() {
@@ -482,43 +489,107 @@ public class TestActivity extends BaseActivity {
 
     }
 
-    public void testAudioTrack(View view){
-        String text = editText.getText().toString();
-        RetrofitUrlManager.getInstance().putDomain(Api.URL_VALUE_AUDIO,Api.AUDIOURL);
-        RetrofitHelper.getInstance()
-                .getRetrofit()
-                .create(Api.class)
-                .playAudio(text)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.newThread())
-                .subscribeWith(new DisposableObserver<ResponseBody>() {
-                    @Override
-                    public void onNext(ResponseBody value) {
-                        JSONObject jsonObject;
-                        try {
-                            String s = value.string();
-                            LogUtil.i(s);
-                            AudioTrackUtil util = new AudioTrackUtil();
-                            jsonObject = new JSONObject(s);
-                            LogUtil.i(jsonObject.optString("data"));
-                            util.startPlay(jsonObject.optString("data"));
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }catch (JSONException e){
-                            e.printStackTrace();
-                        }
-                    }
 
-                    @Override
-                    public void onError(Throwable e) {
+    boolean tag;
+    int position;
+    SparseArray<String> array = new SparseArray<>();
+    AudioTrackUtil util = new AudioTrackUtil();
+    WsManager manager;
+    String s = "感冒熟悉一下：感冒总体上分为普通感冒和流行性感冒，" +
+            "在这里先讨论普通感冒。普通感冒，祖国医学称\"伤风\"，" +
+            "是由多种病毒引起的一种呼吸道常见病，其中30%-50%是由某种血清型的鼻病毒引起，" +
+            "普通感冒虽多发于初冬，但任何季节，如春天，夏天也可发生，不同季节的感冒的致病病毒并非完全一样。" +
+            "流行性感冒，是由流感病毒引起的急性呼吸道传染病。" +
+            "病毒存在于病人的呼吸道中，在病人咳嗽，打喷嚏时经飞沫传染给别人。" +
+            "流感的传染性很强，由于这种病毒容易变异，即使是患过流感的人，当下次再遇上流感流行，他仍然会感染，所以流感容易引起暴发性流行。" +
+            "一般在冬春季流行的机会较多，每次可能有20～40%的人会传染上流感。";
+//        String s = "百日咳是由百日咳杆菌所致的急性呼吸道传染病。其特征为阵发性痉挛性咳嗽，咳嗽末伴有特殊的鸡鸣样吸气吼声。";
 
-                    }
+    AudioTrackUtil.OnState stateListener = new AudioTrackUtil.OnState() {
+        @Override
+        public void onStateChanged(AudioTrackUtil.WindState currentState) {
+            LogUtil.i("aaa"+currentState.toString());
+            if(currentState == AudioTrackUtil.WindState.STOP_PLAY){
+                LogUtil.i("aaa"+array.size()+"array.size()"+position);
+                if(position<=array.size()-1) {
+                    util.startPlay(array.get(position));
+                    position++;
+                    return;
+                }
+                tag = true;
+            }else if(currentState == AudioTrackUtil.WindState.PLAYING){
+                tag = false;
+            }
+        }
+    };
 
-                    @Override
-                    public void onComplete() {
+    public void testAudioTrack(View view) {
+        tag = true;
+        JSONObject object = new JSONObject();
+        try {
+            object.putOpt("text",s);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        WsStatusListener listener = new WsStatusListener() {
+            @Override
+            public void onOpen(Response response) {
+                super.onOpen(response);
+                LogUtil.i("onOpen"+response.toString());
+                util.setOnStateListener(stateListener);
+                manager.send(object.toString());
+            }
 
-                    }
-                });
+            @Override
+            public void onMessage(String text) {
+                super.onMessage(text);
+                array.append(array.size(),text);
+                if(tag && position<=array.size()-1) {
+                    util.startPlay(array.get(position));
+                    position++;
+                }
+            }
 
+            @Override
+            public void onMessage(ByteString bytes) {
+                super.onMessage(bytes);
+                LogUtil.i("onMessage2"+bytes.base64());
+            }
+
+            @Override
+            public void onClosing(int code, String reason) {
+                super.onClosing(code, reason);
+                LogUtil.i("onClosing"+reason);
+            }
+
+            @Override
+            public void onClosed(String reason) {
+                super.onClosed(reason);
+                LogUtil.i("onClosed"+reason);
+            }
+
+            @Override
+            public void onFailure(Throwable t, Response response) {
+                super.onFailure(t, response);
+                t.printStackTrace();
+                LogUtil.i("onFailure"+response.toString());
+            }
+
+            @Override
+            public void onReconnect() {
+                super.onReconnect();
+                LogUtil.i("onReconnect");
+            }
+        };
+
+        manager = new WsManager.Builder()
+                .client(new OkHttpClient().newBuilder()
+                        .pingInterval(60, TimeUnit.SECONDS)//设置的60秒后断开连接
+                        .retryOnConnectionFailure(true)
+                        .build())
+                .listener(listener)
+                .url(Api.AUDIOURL+"/tts/")
+                .build();
+        manager.startConnect();
     }
 }

@@ -12,7 +12,7 @@ import android.util.Base64;
 /**
  * @Author: gl
  * @CreateDate: 2020/1/15
- * @Description:
+ * @Description: 自主研发的语音合成工具类
  */
 public class AudioTrackUtil {
     private static final int AUDIO_FREQUENCY = 22050;
@@ -29,6 +29,11 @@ public class AudioTrackUtil {
         }
         new AudioTrackPlayThread(Base64.decode(s,Base64.DEFAULT)).start();
     }
+    public void setOnStateListener(OnState listener){
+        this.onStateListener = listener;
+    }
+
+
 
     public synchronized void stopPlay() {
         if (!state.equals(WindState.PLAYING)) {

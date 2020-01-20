@@ -16,7 +16,7 @@ import okhttp3.ResponseBody;
 public interface SpeakContract {
     interface Model{
         void ask(String question, DisposableSingleObserver<ResponseBody> observer);
-
+        void speak(String text, DisposableSingleObserver<ResponseBody> observer);
     }
     interface View extends IView {
         void showToast(String toast);

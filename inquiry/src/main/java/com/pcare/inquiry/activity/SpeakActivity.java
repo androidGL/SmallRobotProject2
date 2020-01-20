@@ -16,7 +16,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.pcare.common.base.BaseActivity;
-import com.pcare.common.util.LogUtil;
 import com.pcare.inquiry.R;
 import com.pcare.inquiry.contract.SpeakContract;
 import com.pcare.inquiry.presenter.SpeakPresenter;
@@ -57,16 +56,16 @@ public class SpeakActivity extends BaseActivity<SpeakPresenter> implements Speak
                 break;
             case "speak":
                 presenter.useSpeakType();
-                initBpttomView();
+                initBottomView();
                 break;
             case "ask":
                 presenter.useAskType();
-                initBpttomView();
+                initBottomView();
                 break;
         }
 
     }
-    private void initBpttomView(){
+    private void initBottomView(){
         bottomSpeak.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View view, MotionEvent motionEvent) {

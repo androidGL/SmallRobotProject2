@@ -13,8 +13,8 @@ import com.pcare.inquiry.R;
 
 @Route(path = "/inquiry/main")
 public class MainActivity extends BaseActivity {
-    @Autowired
-    public String inquiryType;
+//    @Autowired
+    public String inquiryType = "haha";
 
     private TextView inquiry_type;
 

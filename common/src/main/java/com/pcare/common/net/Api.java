@@ -36,6 +36,7 @@ public interface Api {
     String FACEURL = "http://192.168.2.181:8000/fl";
 
     //问诊的URL
+
     String URL_VALUE_QUESTION = "URL_VALUE_QUESTION";
     String QUESTIONURL = "http://192.168.2.180:8080";
     //天益本地问诊的URL
@@ -114,6 +115,6 @@ public interface Api {
 
     @Headers({URL_KEY+":"+URL_VALUE_AUDIO})
     @GET("tts")
-    Observable<ResponseBody> playAudio(@Query("text") String text);
+    Single<ResponseBody> playAudio(@Query("text") String text);
 
 }

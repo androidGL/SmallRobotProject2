@@ -28,4 +28,18 @@ public class SpeakModel implements SpeakContract.Model {
                 .subscribeOn(Schedulers.newThread())
                 .subscribeWith(observer);
     }
+
+    @Override
+    public void speak(String text, DisposableSingleObserver<ResponseBody> observer) {
+        RetrofitUrlManager.getInstance().putDomain(Api.URL_VALUE_AUDIO,Api.AUDIOURL);
+        RetrofitHelper.getInstance()
+                .getRetrofit()
+                .create(Api.class)
+                .playAudio(text)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
+                .subscribeWith(observer);
+    }
+
+
 }

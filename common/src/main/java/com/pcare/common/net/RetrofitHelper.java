@@ -35,8 +35,8 @@ import static okhttp3.Protocol.HTTP_1_1;
 public class RetrofitHelper {
     private static volatile RetrofitHelper instance;
     private final Retrofit retrofit;
-    private static final int READ_TIMEOUT = 12;//读取超时时间（秒）
-    private static final int CONN_TIMEOUT = 12;//连接超时时间（秒）
+    private static final int READ_TIMEOUT = 60;//读取超时时间（秒）
+    private static final int CONN_TIMEOUT = 60;//连接超时时间（秒）
 
     /**
      * 在生成OKHTTP的builder时，RetrofitUrlManager.getInstance()得到的是用于修改BaseURL的类的实例，with返回的是OkHttpClient.Builder
@@ -54,7 +54,7 @@ public class RetrofitHelper {
                         .addInterceptor(new simulateResponse())
                         .connectTimeout(CONN_TIMEOUT, TimeUnit.SECONDS)
                         .readTimeout(READ_TIMEOUT, TimeUnit.SECONDS)
-                        .writeTimeout(10, TimeUnit.SECONDS)
+                        .writeTimeout(100, TimeUnit.SECONDS)
                         .build())
                 .build();
     }

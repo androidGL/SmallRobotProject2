@@ -13,6 +13,8 @@ import com.iflytek.cloud.RecognizerListener;
 import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechError;
 import com.pcare.common.base.BasePresenter;
+import com.pcare.common.util.AudioTrackUtil;
+import com.pcare.common.util.LogUtil;
 import com.pcare.common.util.TTSUtil;
 import com.pcare.inquiry.R;
 import com.pcare.inquiry.adapter.QuestionSelectAdapter;
@@ -21,6 +23,9 @@ import com.pcare.inquiry.contract.SpeakContract;
 import com.pcare.inquiry.entity.MsgEntity;
 import com.pcare.inquiry.entity.QuestionEnity;
 import com.pcare.inquiry.model.SpeakModel;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,8 +50,9 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
     private String speechText;
     private Activity activity;
     private SpeakContract.Model model;
-    DisposableSingleObserver<ResponseBody> askObserver;
+    DisposableSingleObserver<ResponseBody> askObserver,speakObserver;
     private int type = 0;//0表示select，1表示speak，2表示ask
+    private AudioTrackUtil audioTrackUtil = new AudioTrackUtil();
 
     public SpeakPresenter(SpeakContract.View view) {
         super(view);
@@ -111,24 +117,41 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
     }
 
     /**
-     * 开始语音播报
-     * @param msg
-     */
-    private void startSpeaking(String msg){
-        TTSUtil.getInstance(activity.getApplicationContext()).speaking(msg);
-    }
-
-    /**
      * 停止语音播报
      */
     private void stopSpeaking(){
-        TTSUtil.getInstance(activity.getApplicationContext()).stopSpeaking();
+//        TTSUtil.getInstance(activity.getApplicationContext()).stopSpeaking();
     }
 
-
+    /**
+     * 开始语音播报
+     * @param s
+     */
     @Override
     public void setSpeakStr(String s) {
-        TTSUtil.getInstance(activity.getApplicationContext()).speaking(s);
+        speakObserver = new DisposableSingleObserver<ResponseBody>() {
+            @Override
+            public void onSuccess(ResponseBody value) {
+                JSONObject jsonObject;
+                try {
+                    String s = value.string();
+                    jsonObject = new JSONObject(s);
+                    audioTrackUtil.startPlay(jsonObject.optString("data"));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }catch (JSONException e){
+                    e.printStackTrace();
+                }
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                e.printStackTrace();
+            }
+        };
+        addDisposable(speakObserver);
+        model.speak(s,speakObserver);
+//        TTSUtil.getInstance(activity.getApplicationContext()).speaking(s);
     }
 
     @Override
@@ -151,7 +174,7 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
             if (null != queationTitleList && queationTitleList.size() > 0) {
                 msgEntityList.add(new MsgEntity(queationTitleList.get(0), 2));
                 selectAdapter.notifyDataSetChanged();
-                startSpeaking(queationTitleList.get(0));
+                setSpeakStr(queationTitleList.get(0));
                 queationTitleList.remove(0);
             }
         }else if(type == 2) {
@@ -167,7 +190,7 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
                         }
                         msgEntityList.add(new MsgEntity(result, 2));
                         selectAdapter.notifyDataSetChanged();
-                        startSpeaking(result);
+                        setSpeakStr(result);
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
