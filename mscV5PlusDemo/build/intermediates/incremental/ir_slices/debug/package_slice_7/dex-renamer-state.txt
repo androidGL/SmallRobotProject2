@@ -1,0 +1,4 @@
+#Thu Feb 13 15:00:13 CST 2020
+base.0=D\:\\Android\\project\\InquiryProject\\mscV5PlusDemo\\build\\intermediates\\transforms\\dexMerger\\debug\\7
+path.0=classes.dex
+renamed.0=classes.dex

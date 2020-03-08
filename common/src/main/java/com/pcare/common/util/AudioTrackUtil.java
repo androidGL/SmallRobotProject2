@@ -27,6 +27,7 @@ public class AudioTrackUtil {
         if (!isIdle() || TextUtils.isEmpty(s)) {
             return;
         }
+
         new AudioTrackPlayThread(Base64.decode(s,Base64.DEFAULT)).start();
     }
     public void setOnStateListener(OnState listener){

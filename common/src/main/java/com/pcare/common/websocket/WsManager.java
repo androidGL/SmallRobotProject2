@@ -31,28 +31,25 @@ public class WsManager implements IWsManager {
     private int reconnectCount = 3;
     private WsStatusListener statusListener;
     private volatile boolean heartTag = true;
-    private Handler mainHandler = new Handler(Looper.getMainLooper());
-    private Runnable reConnectRunnable = new Runnable() {
-        @Override
-        public void run() {
-            if (statusListener != null) {
-                statusListener.onReconnect();
-            }
-            buildConnect();
-        }
-    };
-    private JSONObject heartObject = new JSONObject();
+    private final String HEARTMSG = "{\"text\":\"heartbeat_info\"}";
 
     private Handler heartHandler = new Handler();
     private Runnable heartRunnable = new Runnable() {
         @Override
         public void run() {
             if(heartTag) {
-                send(heartObject.toString());//发送一个心跳包给服务器
+                send(HEARTMSG);//发送一个心跳包给服务器
                 heartHandler.postDelayed(this, RECONNECT_STEP);
             }
         }
     };
+
+    private void sendHeart(){
+        if(null != heartHandler) {
+            heartHandler.removeCallbacks(heartRunnable);
+            heartHandler.post(heartRunnable);
+        }
+    }
 
     private WebSocketListener mWebSocketListener = new WebSocketListener() {
         @Override
@@ -64,13 +61,13 @@ public class WsManager implements IWsManager {
             if (null != statusListener) {
                 statusListener.onOpen(response);
             }
-            heartHandler.postDelayed(heartRunnable, RECONNECT_STEP);
+
         }
 
         @Override
         public void onMessage(WebSocket webSocket, String text) {
             super.onMessage(webSocket, text);
-
+            setCurrentStatus(WsStatus.CONNECTED);
 
             LogUtil.i("onMessage"+text);
 
@@ -101,6 +98,9 @@ public class WsManager implements IWsManager {
         @Override
         public void onClosing(WebSocket webSocket, int code, String reason) {
             super.onClosing(webSocket, code, reason);
+            heartTag = false;
+            heartHandler.removeCallbacks(heartRunnable);
+            setCurrentStatus(WsStatus.CLOSECONNECT);
             if (null != statusListener)
                 statusListener.onClosing(code, reason);
         }
@@ -110,6 +110,7 @@ public class WsManager implements IWsManager {
             super.onClosed(webSocket, code, reason);
             heartTag = false;
             heartHandler.removeCallbacks(heartRunnable);
+            setCurrentStatus(WsStatus.CLOSECONNECT);
             if (null != statusListener)
                 statusListener.onClosed(reason);
         }
@@ -118,8 +119,11 @@ public class WsManager implements IWsManager {
         public void onFailure(WebSocket webSocket, Throwable t, Response response) {
             super.onFailure(webSocket, t, response);
 //            reConnect();
-            heartTag = false;
-            heartHandler.postDelayed(heartRunnable,0);
+            setCurrentStatus(WsStatus.CLOSECONNECT);
+            if(null != heartHandler) {
+                heartTag = false;
+                heartHandler.removeCallbacks(heartRunnable);
+            }
             if (null != statusListener)
                 statusListener.onFailure(t, response);
         }
@@ -129,29 +133,19 @@ public class WsManager implements IWsManager {
         this.mOkHttpClient = builder.client;
         this.mUrl = builder.url;
         this.statusListener = builder.listener;
-        try {
-            this.heartObject.putOpt("text","heartbeat_info");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
-    private void reConnect() {
-        heartHandler.removeCallbacks(heartRunnable);
-        mWebSocket.cancel();//取消掉以前的长连接
-        buildConnect();//创建一个新的连接
-        if (statusListener != null) {
-            statusListener.onReconnect();
-        }
-        setCurrentStatus(WsStatus.RECONNECT);
-        heartHandler.postDelayed(heartRunnable, RECONNECT_STEP);
-        reconnectCount++;
-    }
-
-    private void cancelReconnect() {
-        mainHandler.removeCallbacks(reConnectRunnable);
-        reconnectCount = 0;
-    }
+//    private void reConnect() {
+//        heartHandler.removeCallbacks(heartRunnable);
+//        mWebSocket.cancel();//取消掉以前的长连接
+//        buildConnect();//创建一个新的连接
+//        if (statusListener != null) {
+//            statusListener.onReconnect();
+//        }
+//        setCurrentStatus(WsStatus.RECONNECT);
+//        heartHandler.postDelayed(heartRunnable, RECONNECT_STEP);
+//        reconnectCount++;
+//    }
 
 
     /**
@@ -181,21 +175,16 @@ public class WsManager implements IWsManager {
     }
 
     private void closeConnect() {
-        if (getCurrentStatus() == WsStatus.CLOSECONNECT)
+        heartHandler.removeCallbacks(heartRunnable);
+        heartRunnable = null;
+        heartHandler = null;
+        if (getCurrentStatus() == WsStatus.CLOSECONNECT) {
             return;
-        cancelReconnect();
+        }
         if (null != mOkHttpClient) {
             //取消掉之前的所有请求
             mOkHttpClient.dispatcher().cancelAll();
         }
-//        if(null != mWebSocket){
-//            if(!mWebSocket.close(WsStatus.CLOSE_NORMAL,WsStatus.CLOSE_NORMAL_REASON)){
-//                //如果不是正常关闭连接
-//                if(null != statusListener){
-//                    statusListener.onClosed();
-//                }
-//            }
-//        }
         mWebSocket.close(WsStatus.CLOSE_NORMAL, WsStatus.CLOSE_NORMAL_REASON);
         statusListener.onClosed("stopConnect");
         setCurrentStatus(WsStatus.CLOSECONNECT);
@@ -220,7 +209,7 @@ public class WsManager implements IWsManager {
 
     @Override
     public boolean isConnected() {
-        return mCurrentStatus == WsStatus.CONNECTED;
+        return mCurrentStatus == WsStatus.CONNECTED || mCurrentStatus==WsStatus.CONNECTING;
     }
 
     @Override
@@ -236,16 +225,23 @@ public class WsManager implements IWsManager {
     @Override
     public boolean send(Object o) {
         boolean isSend = false;
+        if(!o.toString().equals(HEARTMSG)){
+            heartTag = true;
+            sendHeart();
+        }
         LogUtil.i("getCurrentStatus():"+getCurrentStatus()+"   Object:"+o.toString());
-        if(null != mWebSocket && getCurrentStatus() == WsStatus.CONNECTING){
+
+        if(null != mWebSocket && isConnected()){
             if(o instanceof String){
                 isSend = mWebSocket.send((String)o);
             }else if(o instanceof ByteString){
                 isSend = mWebSocket.send((ByteString) o);
             }
+            LogUtil.i("isSend:"+isSend);
             //发送消息失败，重新连接
-            if(!isSend){
-                reConnect();
+            if(!isSend && null != heartHandler){
+                heartTag = false;
+                heartHandler.removeCallbacks(heartRunnable);
             }
         }
         return isSend;
@@ -266,7 +262,6 @@ public class WsManager implements IWsManager {
 
     public static final class Builder {
         private String url;
-        private boolean needReconect = true;
         private OkHttpClient client;
         private WsStatusListener listener;
 
@@ -282,11 +277,6 @@ public class WsManager implements IWsManager {
 
         public Builder listener(WsStatusListener listener) {
             this.listener = listener;
-            return this;
-        }
-
-        public Builder needReconect(boolean needReconect) {
-            this.needReconect = needReconect;
             return this;
         }
 

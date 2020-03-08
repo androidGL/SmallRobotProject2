@@ -14,6 +14,7 @@ import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechError;
 import com.pcare.common.base.BasePresenter;
 import com.pcare.common.util.AudioTrackUtil;
+import com.pcare.common.util.AudioWSUtil;
 import com.pcare.common.util.LogUtil;
 import com.pcare.common.util.TTSUtil;
 import com.pcare.inquiry.R;
@@ -120,6 +121,7 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
      * 停止语音播报
      */
     private void stopSpeaking(){
+        AudioWSUtil.getInstance().stopSpeaking();
 //        TTSUtil.getInstance(activity.getApplicationContext()).stopSpeaking();
     }
 
@@ -129,34 +131,37 @@ public class SpeakPresenter extends BasePresenter<SpeakContract.View> implements
      */
     @Override
     public void setSpeakStr(String s) {
-        speakObserver = new DisposableSingleObserver<ResponseBody>() {
-            @Override
-            public void onSuccess(ResponseBody value) {
-                JSONObject jsonObject;
-                try {
-                    String s = value.string();
-                    jsonObject = new JSONObject(s);
-                    audioTrackUtil.startPlay(jsonObject.optString("data"));
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }catch (JSONException e){
-                    e.printStackTrace();
-                }
-            }
-
-            @Override
-            public void onError(Throwable e) {
-                e.printStackTrace();
-            }
-        };
-        addDisposable(speakObserver);
-        model.speak(s,speakObserver);
+        AudioWSUtil.getInstance().speaking(s);
+//        speakObserver = new DisposableSingleObserver<ResponseBody>() {
+//            @Override
+//            public void onSuccess(ResponseBody value) {
+//                JSONObject jsonObject;
+//                try {
+//                    String s = value.string();
+//                    jsonObject = new JSONObject(s);
+//                    audioTrackUtil.startPlay(jsonObject.optString("data"));
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                }catch (JSONException e){
+//                    e.printStackTrace();
+//                }
+//            }
+//
+//            @Override
+//            public void onError(Throwable e) {
+//                e.printStackTrace();
+//            }
+//        };
+//        addDisposable(speakObserver);
+//        model.speak(s,speakObserver);
+        //方式1，讯飞
 //        TTSUtil.getInstance(activity.getApplicationContext()).speaking(s);
     }
 
     @Override
     public void destoty() {
-        stopSpeaking();
+//        stopSpeaking();
+        AudioWSUtil.getInstance().destory();
     }
 
     @Override
